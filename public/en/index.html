@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1a1410">
+  <title>TRPG Desk · TRPG Game Master Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Crimson+Pro:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style.css?v=2.4.51">
+</head>
+<body>
+  <!-- Toast -->
+  <div id="toast" class="toast" style="display:none;"></div>
+
+  <!-- 静态演示模式 banner(自动在无服务器时显示) -->
+  <div id="demoBanner" class="demo-banner" style="display:none;">
+    🎭 <strong>Static Demo Mode</strong> · Data is only saved in your local browser and will not sync to other devices · Server controls (shutdown/restart) are unavailable
+  </div>
+
+  <!-- 断线重连 banner -->
+  <div id="reconnectBanner" class="reconnect-banner" style="display:none;">
+    <span id="reconnectText">⚠️ Disconnected from server, reconnecting…</span>
+  </div>
+
+  <!-- v2.4.50: 店家品牌水印(康康桌游)- 固定右下角,不遮挡 UI -->
+  <div id="brandWatermark" class="brand-watermark">KangKang Board Games</div>
+
+  <!-- ====================== 首页 / 角色选择 ====================== -->
+  <div id="homeView" class="view home-view">
+    <div class="bg-noise"></div>
+    <div class="home-wrap">
+      <header class="home-header">
+        <div class="home-crest">🕯️</div>
+        <h1 class="home-title">TRPG <span class="home-dot">·</span> DESK</h1>
+        <p class="home-subtitle">TRPG Game Master Assistant</p>
+        <div class="home-status" id="homeStatus">Not connected</div>
+      </header>
+
+      <div class="role-grid" id="roleGrid">
+        <button class="role-btn" data-role="pad">
+          <div class="role-emoji">🖥️</div>
+          <div class="role-name">Pad Board</div>
+          <div class="role-desc">Public board · drag tokens</div>
+          <div class="role-status" id="rsPad">Idle</div>
+        </button>
+        <button class="role-btn" data-role="p1">
+          <div class="role-emoji">🔴</div>
+          <div class="role-name">Player 1</div>
+          <div class="role-desc">View private clues</div>
+          <div class="role-status" id="rsP1">Idle</div>
+        </button>
+        <button class="role-btn" data-role="p2">
+          <div class="role-emoji">🔵</div>
+          <div class="role-name">Player 2</div>
+          <div class="role-desc">View private clues</div>
+          <div class="role-status" id="rsP2">Idle</div>
+        </button>
+        <button class="role-btn" data-role="p3">
+          <div class="role-emoji">🟢</div>
+          <div class="role-name">Player 3</div>
+          <div class="role-desc">View private clues</div>
+          <div class="role-status" id="rsP3">Idle</div>
+        </button>
+        <button class="role-btn" data-role="p4">
+          <div class="role-emoji">🟡</div>
+          <div class="role-name">Player 4</div>
+          <div class="role-desc">View private clues</div>
+          <div class="role-status" id="rsP4">Idle</div>
+        </button>
+        <button class="role-btn" data-role="p5">
+          <div class="role-emoji">🟣</div>
+          <div class="role-name">Player 5</div>
+          <div class="role-desc">View private clues</div>
+          <div class="role-status" id="rsP5">Idle</div>
+        </button>
+        <button class="role-btn" data-role="p6">
+          <div class="role-emoji">🟠</div>
+          <div class="role-name">Player 6</div>
+          <div class="role-desc">View private clues</div>
+          <div class="role-status" id="rsP6">Idle</div>
+        </button>
+        <button class="role-btn role-btn-host" data-role="host">
+          <div class="role-emoji">🎭</div>
+          <div class="role-name">Game Master</div>
+          <div class="role-desc">Console · distribute content</div>
+          <div class="role-status" id="rsHost">Idle</div>
+        </button>
+      </div>
+
+      <div class="home-actions">
+        <button class="home-qr-btn" id="homeQrBtn" title="Show QR code to scan to join">📱 Scan to Join</button>
+      </div>
+
+      <footer class="home-footer">
+        <p>Supports 1–6 players (extensible to 10) · Join via URL or QR code</p>
+        <p class="home-tip">📱 Phone: choose "Player/Game Master",📟 Tablet/PC: choose "Pad"</p>
+        <p class="home-url" id="homeUrl"></p>
+      </footer>
+    </div>
+  </div>
+
+  <!-- v2.4.36: 手机扫码专用 - 角色选择页(进入 /join 触发) -->
+  <div id="joinView" class="view join-view" style="display:none;">
+    <div class="bg-noise"></div>
+    <div class="join-wrap">
+      <header class="join-header">
+        <div class="join-crest">🕯️</div>
+        <h1 class="join-title">TRPG <span class="join-dot">·</span> DESK</h1>
+        <p class="join-subtitle">Choose your role</p>
+        <div class="join-status" id="joinStatus">Connecting…</div>
+      </header>
+
+      <div class="join-room-info">
+        <div class="join-room-title" id="joinRoomTitle">— Room loading —</div>
+        <div class="join-room-meta" id="joinRoomMeta"></div>
+      </div>
+
+      <div class="join-grid" id="joinGrid">
+        <button class="join-card" data-join-role="p1">
+          <div class="join-card-dot" style="background:#e74c3c"></div>
+          <div class="join-card-name">Player 1</div>
+          <div class="join-card-status" data-status="p1">Idle</div>
+        </button>
+        <button class="join-card" data-join-role="p2">
+          <div class="join-card-dot" style="background:#3498db"></div>
+          <div class="join-card-name">Player 2</div>
+          <div class="join-card-status" data-status="p2">Idle</div>
+        </button>
+        <button class="join-card" data-join-role="p3">
+          <div class="join-card-dot" style="background:#2ecc71"></div>
+          <div class="join-card-name">Player 3</div>
+          <div class="join-card-status" data-status="p3">Idle</div>
+        </button>
+        <button class="join-card" data-join-role="p4">
+          <div class="join-card-dot" style="background:#f39c12"></div>
+          <div class="join-card-name">Player 4</div>
+          <div class="join-card-status" data-status="p4">Idle</div>
+        </button>
+        <button class="join-card" data-join-role="p5">
+          <div class="join-card-dot" style="background:#9b59b6"></div>
+          <div class="join-card-name">Player 5</div>
+          <div class="join-card-status" data-status="p5">Idle</div>
+        </button>
+        <button class="join-card" data-join-role="p6">
+          <div class="join-card-dot" style="background:#e67e22"></div>
+          <div class="join-card-name">Player 6</div>
+          <div class="join-card-status" data-status="p6">Idle</div>
+        </button>
+      </div>
+
+      <div class="join-pad-row">
+        <button class="join-card join-card-pad" data-join-role="pad">
+          <div class="join-card-dot" style="background:#5dade2">🖥️</div>
+          <div class="join-card-name">Pad Board</div>
+          <div class="join-card-status" data-status="pad">Idle</div>
+          <div class="join-card-hint">Public board · drag tokens</div>
+        </button>
+      </div>
+
+      <footer class="join-footer">
+        <p>After choosing a role you'll enter the game directly; you can leave anytime</p>
+        <p class="join-version" id="joinVersion"></p>
+      </footer>
+    </div>
+  </div>
+
+  <!-- v2.4.32: 扫码加入弹窗 -->
+  <div id="joinQrModal" class="join-qr-modal" style="display:none;">
+    <div class="join-qr-content">
+      <button class="join-qr-close" id="joinQrClose" aria-label="Close">✕</button>
+      <h2 class="join-qr-title">📱 Scan to Join Room</h2>
+      <p class="join-qr-hint">Players scan the QR code below with their phone camera to open the browser and join the room (auto-assigned to a free slot).</p>
+      <div class="join-qr-img-wrap">
+        <img id="joinQrImg" alt="Join room QR code" class="join-qr-img" src=""/>
+      </div>
+      <div class="join-qr-url-row">
+        <span class="join-qr-url-label">Join link:</span>
+        <code id="joinQrUrl" class="join-qr-url"></code>
+        <button class="join-qr-copy" id="joinQrCopy">Copy</button>
+      </div>
+      <!-- v2.4.33: 手动输入 IP 兑底(扫码失败时用) -->
+      <details class="join-qr-fallback">
+        <summary>📌 QR won't open? Click here to enter manually</summary>
+        <div class="join-qr-fallback-body">
+          <p class="join-qr-hint" style="margin: 4px 0 8px;">Enter any address below in your phone browser (must be on the same WiFi as the PC):</p>
+          <div class="join-qr-manual-row" id="joinQrManualList"></div>
+        </div>
+      </details>
+      <p class="join-qr-foot">💡 Tip: Make sure your phone and PC are on the same WiFi / LAN</p>
+    </div>
+  </div>
+
+  <!-- ====================== Pad 视图 ====================== -->
+  <div id="padView" class="view pad-view" style="display:none;">
+    <div class="pad-stage" id="padStage">
+      <img class="pad-map-img" id="padMapImg" alt="" style="display:none;">
+      <div class="pad-map-placeholder" id="padMapPlaceholder">
+        <div class="pad-placeholder-icon">🗺️</div>
+        <div class="pad-placeholder-text">Waiting for GM to set the map…</div>
+      </div>
+      <div class="pad-map-items" id="padMapItems"></div>
+      <div class="pad-npcs" id="padNpcs"></div>
+      <div class="pad-pieces">
+        <div class="pad-piece piece-p1" id="padPieceP1" data-player="p1" style="display:none;">
+          <div class="pad-piece-avatar" id="padPieceP1Avatar"></div>
+          <div class="pad-piece-label" id="padPieceP1Label">P1</div>
+          <div class="pad-piece-hp" id="padPieceP1Hp" style="display:none;"></div>
+        </div>
+        <div class="pad-piece piece-p2" id="padPieceP2" data-player="p2" style="display:none;">
+          <div class="pad-piece-avatar" id="padPieceP2Avatar"></div>
+          <div class="pad-piece-label" id="padPieceP2Label">P2</div>
+          <div class="pad-piece-hp" id="padPieceP2Hp" style="display:none;"></div>
+        </div>
+        <div class="pad-piece piece-p3" id="padPieceP3" data-player="p3" style="display:none;">
+          <div class="pad-piece-avatar" id="padPieceP3Avatar"></div>
+          <div class="pad-piece-label" id="padPieceP3Label">P3</div>
+          <div class="pad-piece-hp" id="padPieceP3Hp" style="display:none;"></div>
+        </div>
+        <div class="pad-piece piece-p4" id="padPieceP4" data-player="p4" style="display:none;">
+          <div class="pad-piece-avatar" id="padPieceP4Avatar"></div>
+          <div class="pad-piece-label" id="padPieceP4Label">P4</div>
+          <div class="pad-piece-hp" id="padPieceP4Hp" style="display:none;"></div>
+        </div>
+        <div class="pad-piece piece-p5" id="padPieceP5" data-player="p5" style="display:none;">
+          <div class="pad-piece-avatar" id="padPieceP5Avatar"></div>
+          <div class="pad-piece-label" id="padPieceP5Label">P5</div>
+          <div class="pad-piece-hp" id="padPieceP5Hp" style="display:none;"></div>
+        </div>
+        <div class="pad-piece piece-p6" id="padPieceP6" data-player="p6" style="display:none;">
+          <div class="pad-piece-avatar" id="padPieceP6Avatar"></div>
+          <div class="pad-piece-label" id="padPieceP6Label">P6</div>
+          <div class="pad-piece-hp" id="padPieceP6Hp" style="display:none;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 大屏高亮(2秒短暂显示) -->
+    <div id="padHighlight" class="pad-highlight" style="display:none;">
+      <div class="pad-highlight-content" id="padHighlightContent"></div>
+    </div>
+
+    <!-- v2.4.18: NPC 对话弹窗(玩家点击 NPC 后,pad 大屏显示,pad 端可点击切换下一条) -->
+    <div id="padNpcDialog" class="pad-npc-dialog" style="display:none;"></div>
+
+    <!-- v2.4.45: NPC AI 对话实时显示(pad 端右下角浮窗) -->
+    <div id="padAiChatBox" class="pad-ai-chat-box" style="display:none;">
+      <div class="pad-ai-chat-header">
+        <span id="padAiChatTitle">💬 NPC Dialog</span>
+        <button class="pad-ai-chat-toggle" id="padAiChatToggle">—</button>
+      </div>
+      <div class="pad-ai-chat-body" id="padAiChatBody">
+        <div class="pad-ai-chat-empty">Player-NPC AI dialog will appear here</div>
+      </div>
+    </div>
+
+    <!-- v2.4.18: 地图标记(主持人点击版图,pad 端显示一个箭头,几秒后自动消失) -->
+    <div class="pad-map-marker-layer" id="padMapMarkerLayer"></div>
+
+    <div class="pad-topbar">
+      <div class="pad-title" id="padScriptTitle">TRPG Module</div>
+      <div class="pad-actions">
+        <button class="pad-btn pad-btn-turn" id="padNextTurn" title="Click to advance to the next player's turn">
+          <span class="pad-turn-label">Current Turn</span>
+          <span class="pad-turn-current" id="padTurnCurrentName">—</span>
+          <span class="pad-turn-sep">·</span>
+          <span class="pad-turn-next">Next Turn ➡️</span>
+        </button>
+        <button class="pad-btn" id="padToggleFeed">📥 Feed <span class="badge" id="padFeedCount" style="display:none;">0</span></button>
+        <button class="pad-btn" id="padFullscreen">⛶ Fullscreen</button>
+        <button class="pad-btn pad-btn-ghost" id="padExit">Exit</button>
+      </div>
+    </div>
+
+    <div class="pad-feed" id="padFeed">
+      <div class="pad-feed-header">
+        <span>📥 Feed / Public Content</span>
+        <button class="pad-feed-close" id="padFeedClose">✕</button>
+      </div>
+      <div class="pad-feed-list" id="padFeedList">
+        <div class="pad-feed-empty">No content yet</div>
+      </div>
+    </div>
+
+    <!-- v2.4.47: 已移除原 NPC 对话弹窗(玩家点击 NPC 触发的旧功能),统一使用 AI 对话 -->
+
+    <!-- 线索卡确认拾取弹窗 -->
+    <div id="clueCardModal" class="modal-overlay" style="display:none;">
+      <div class="modal-card">
+        <button class="modal-close" data-close="clueCardModal">✕</button>
+        <h3 class="modal-title">🃏 <span id="clueCardTitle"></span></h3>
+        <div class="modal-body">
+          <div id="clueCardBody" class="clue-card-preview"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="host-btn host-btn-primary" id="clueCardPickupBtn">🎒 Add to Inventory</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- v2.4.28: 图库弹窗 - 主持人从已上传/已用图片中选择 -->
+    <!-- v2.4.29: 升级为"媒体库",支持图片+视频 -->
+    <div id="imageLibraryModal" class="modal-overlay" style="display:none;">
+      <div class="modal-card" style="max-width:780px;width:90vw;max-height:80vh;display:flex;flex-direction:column;">
+        <button class="modal-close" data-close="imageLibraryModal">✕</button>
+        <h3 class="modal-title">🖼️ Media Library <small style="font-size:12px;color:#888;font-weight:normal;" id="imageLibraryCount">0 items</small></h3>
+        <div class="modal-body" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+            <input class="host-input" id="imageLibrarySearch" type="text" placeholder="🔍 Search image/video name/URL..." style="flex:1;min-width:160px;">
+            <select class="host-input" id="imageLibraryMediaType" style="width:120px;" title="Media type">
+              <option value="all">All (image+video)</option>
+              <option value="image">Images only</option>
+              <option value="video">Videos only</option>
+            </select>
+            <select class="host-input" id="imageLibraryType" style="width:140px;">
+              <option value="all">All types</option>
+              <option value="uploaded">Local upload</option>
+              <option value="item">Map item</option>
+              <option value="npc-avatar">NPC avatar</option>
+              <option value="map">Map</option>
+            </select>
+            <button class="host-btn" id="imageLibraryRefreshBtn">🔄 Refresh</button>
+          </div>
+          <div id="imageLibraryGrid" style="flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;padding:4px;"></div>
+          <div id="imageLibraryEmpty" style="display:none;text-align:center;color:#888;padding:30px;">Media library is empty - please upload an image/video or add an item first</div>
+        </div>
+        <div class="modal-footer">
+          <span class="host-hint" style="font-size:11px;color:#888;">Click an image/video to select → fills the body field</span>
+          <button class="host-btn" data-close="imageLibraryModal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================== 玩家视图 ====================== -->
+  <div id="playerView" class="view player-view" style="display:none;">
+    <header class="player-header">
+      <div class="player-id">
+        <span class="player-emoji" id="playerEmoji">🔴</span>
+        <span class="player-name" id="playerName">Player 1</span>
+        <span class="player-map-badge" id="playerMapBadge" style="display:none;">Start Map</span>
+      </div>
+      <div class="player-sub" id="playerScriptTitle">TRPG Module</div>
+      <button class="player-btn player-btn-dice" id="playerDiceBtn">🎲 Dice</button>
+    </header>
+
+    <!-- 子标签切换 -->
+    <nav class="player-tabs">
+      <button class="player-tab active" data-tab="inbox">🔍 Clues</button>
+      <button class="player-tab" data-tab="map">🗺️ Map</button>
+      <button class="player-tab" data-tab="char">👤 Character</button>
+      <button class="player-tab" data-tab="bag">🎒 Inventory</button>
+      <button class="player-tab" data-tab="note">📝 Notes</button>
+      <button class="player-tab" data-tab="chat">💬 Private Chat <span class="player-tab-badge" id="playerChatBadge" style="display:none;">0</span></button>
+    </nav>
+
+    <main class="player-main">
+      <!-- 线索(从版图上拾取 + 主持人推送 + 玩家互发) -->
+      <div class="player-pane active" id="playerPaneInbox" data-pane="inbox">
+        <div class="player-empty" id="playerEmpty">⏳ No clues yet - click to pick up on the map!</div>
+        <div class="player-list" id="playerList"></div>
+
+        <!-- v2.4.35: 别人给我看的线索(只读副本) -->
+        <div class="player-viewed-section">
+          <h3 class="char-section-title">👁️ Shared by others (read-only)</h3>
+          <div class="player-empty" id="playerViewedEmpty">No one has shared a clue with you yet</div>
+          <div class="player-list" id="playerViewedList"></div>
+        </div>
+
+        <!-- 发送线索给其他玩家 -->
+        <div class="player-share">
+          <details>
+            <summary>📤 Send a clue to another player</summary>
+            <div class="player-share-form" id="playerShareForm">
+              <select class="host-input" id="playerShareTarget">
+                <option value="p1">Player 1</option>
+                <option value="p2">Player 2</option>
+              </select>
+              <input class="host-input" id="playerShareTitle" type="text" placeholder="Clue title" maxlength="60">
+              <textarea class="host-input host-textarea" id="playerShareBody" placeholder="Clue content..."></textarea>
+              <input class="host-input" id="playerShareImageUrl" type="text" placeholder="(Optional) Image URL https://...">
+              <button class="host-btn host-btn-upload" id="playerShareUploadBtn" data-accept="image" title="Upload image">📁</button>
+              <input type="file" id="playerShareFile" data-target="playerShareImageUrl" accept="image/*" style="display:none;">
+              <button class="host-btn host-btn-primary" id="playerShareSendBtn">📤 Send Clue</button>
+            </div>
+          </details>
+        </div>
+      </div>
+
+      <!-- 版图(v2.2: 玩家可移动棋子 + 拾取线索 + 触发NPC) -->
+      <div class="player-pane" id="playerPaneMap" data-pane="map" style="display:none;">
+        <div class="player-map-stage" id="playerMapStage">
+          <img class="player-map-img" id="playerMapImg" alt="" style="display:none;">
+          <div class="player-map-placeholder" id="playerMapPlaceholder">No map set</div>
+          <div class="player-map-items" id="playerMapItems"></div>
+          <div class="player-map-npcs" id="playerMapNpcs"></div>
+          <div class="player-map-piece" id="playerMapPiece" style="display:none;">
+            <div class="player-map-piece-avatar" id="playerMapPieceAvatar"></div>
+            <div class="player-map-piece-label" id="playerMapPieceLabel">P</div>
+            <div class="player-map-piece-hp" id="playerMapPieceHp" style="display:none;"></div>
+          </div>
+        </div>
+        <!-- v2.4.24: 玩家端 NPC 对话流(地图下方,galgame 风格),替代原来的提示文字 -->
+        <div id="playerNpcDialog" class="player-npc-dialog" style="display:none;"></div>
+      </div>
+
+      <!-- 角色卡 -->
+      <div class="player-pane" id="playerPaneChar" data-pane="char" style="display:none;">
+        <div class="char-card">
+          <div class="char-row">
+            <div class="char-avatar-box">
+              <img id="charAvatar" class="char-avatar-img" alt="" style="display:none;">
+              <div class="char-avatar-placeholder" id="charAvatarPlaceholder">👤</div>
+              <input type="file" id="charAvatarFile" accept="image/*" style="display:none;">
+              <button class="host-btn char-avatar-upload" id="charAvatarUploadBtn">📁</button>
+              <button class="host-btn char-avatar-upload" id="charAvatarAiBtn" data-ai-generate="npc" title="AI generate avatar">🎨</button>
+            </div>
+            <div class="char-basic">
+              <input class="host-input" id="charName" type="text" placeholder="Character name" maxlength="30">
+              <select class="host-input" id="charGender">
+                <option value="">Gender (optional)</option>
+                <option value="男">Male</option>
+                <option value="女">Female</option>
+                <option value="其他">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="char-vitals">
+            <div class="char-vital">
+              <label>❤️ HP</label>
+              <div class="char-vital-row">
+                <input class="host-input-num" id="charHpCur" type="number" min="0" value="10">
+                <span>/</span>
+                <input class="host-input-num" id="charHpMax" type="number" min="0" value="10">
+              </div>
+            </div>
+            <div class="char-vital">
+              <label>🔵 MP</label>
+              <div class="char-vital-row">
+                <input class="host-input-num" id="charMpCur" type="number" min="0" value="10">
+                <span>/</span>
+                <input class="host-input-num" id="charMpMax" type="number" min="0" value="10">
+              </div>
+            </div>
+            <div class="char-vital">
+              <label>🧠 SAN</label>
+              <div class="char-vital-row">
+                <input class="host-input-num" id="charSanCur" type="number" min="0" value="10">
+                <span>/</span>
+                <input class="host-input-num" id="charSanMax" type="number" min="0" value="10">
+              </div>
+            </div>
+            <!-- v2.4.31: 金币(初始 100) -->
+            <div class="char-vital char-vital-gold">
+              <label>💰 Gold</label>
+              <div class="char-vital-row">
+                <input class="host-input-num char-gold-input" id="charGold" type="number" min="0" max="999999" step="1" value="100" title="Gold (0~999999)">
+                <span class="char-gold-suffix">G</span>
+              </div>
+            </div>
+          </div>
+
+          <h3 class="char-section-title">📊 Custom Attributes</h3>
+          <div class="char-attrs" id="charAttrsList"></div>
+          <button class="host-btn" id="charAttrAddBtn">+ Add Attribute</button>
+
+          <h3 class="char-section-title">🎯 Skills <span style="font-size:12px;color:#888;font-weight:normal;">(COC 1-100 / DND +N)</span></h3>
+          <div class="char-skills" id="charSkillsList"></div>
+          <div class="char-skill-toolbar">
+            <button class="host-btn" id="charSkillAddBtn">+ Add Skill</button>
+            <select class="host-input char-skill-presets" id="charSkillPresets" title="Quickly add common skills">
+              <option value="">📚 Quick add common skills…</option>
+              <optgroup label="🕵️ COC Investigation">
+                <option value="侦查 SPOT|65|调查">Spot Hidden (65)</option>
+                <option value="搜索 SEARCH|70|调查">Search (70)</option>
+                <option value="聆听 LISTEN|60|调查">Listen (60)</option>
+                <option value="图书馆使用 LIBRARY USE|55|学术">Library Use (55)</option>
+                <option value="跟踪 TRACK|45|调查">Track (45)</option>
+              </optgroup>
+              <optgroup label="🗣️ COC Social">
+                <option value="说服 PERSUADE|55|社交">Persuade (55)</option>
+                <option value="恐吓 INTIMIDATE|50|社交">Intimidate (50)</option>
+                <option value="话术 FAST TALK|45|社交">Fast Talk (45)</option>
+                <option value="魅惑 CHARM|60|社交">Charm (60)</option>
+              </optgroup>
+              <optgroup label="📚 COC Academic">
+                <option value="神秘学 OCCULT|40|学术">Occult (40)</option>
+                <option value="心理学 PSYCH|45|学术">Psychology (45)</option>
+                <option value="考古学 ARCHAEOLOGY|35|学术">Archaeology (35)</option>
+                <option value="建筑学 ARCHITECTURE|30|学术">Architecture (30)</option>
+                <option value="医学 MEDICINE|40|学术">Medicine (40)</option>
+                <option value="法律 LAW|30|学术">Law (30)</option>
+                <option value="会计 ACCOUNTING|35|学术">Accounting (35)</option>
+                <option value="历史 HISTORY|45|学术">History (45)</option>
+                <option value="自然学 NATURAL SCIENCE|40|学术">Natural Science (40)</option>
+              </optgroup>
+              <optgroup label="⚔️ COC Combat">
+                <option value="手枪射击 HANDGUN|55|战斗">Handgun (55)</option>
+                <option value="步枪射击 RIFLE|45|战斗">Rifle (45)</option>
+                <option value="斗殴 BRAWL|50|战斗">Brawl (50)</option>
+                <option value="闪避 DODGE|45|战斗">Dodge (45)</option>
+                <option value="急救 FIRST AID|40|战斗">First Aid (40)</option>
+                <option value="潜行 STEALTH|50|潜行">Stealth (50)</option>
+                <option value="开锁 LOCKPICK|35|潜行">Lockpick (35)</option>
+                <option value="机械维修 MECH REPAIR|30|技术">Mech Repair (30)</option>
+                <option value="电气维修 ELECTRICAL REPAIR|30|技术">Electrical Repair (30)</option>
+                <option value="驾驶 DRIVE|40|技术">Drive (40)</option>
+              </optgroup>
+              <optgroup label="🛡️ DND Strength">
+                <option value="运动 ATHLETICS|+2|力量">Athletics (+2)</option>
+              </optgroup>
+              <optgroup label="🗡️ DND Dexterity">
+                <option value="巧手 SLEIGHT|+2|敏捷">Sleight of Hand (+2)</option>
+                <option value="潜行 STEALTH|+2|敏捷">Stealth (+2)</option>
+                <option value="敏捷 ACROBATICS|+2|敏捷">Acrobatics (+2)</option>
+              </optgroup>
+              <optgroup label="🧠 DND Intelligence">
+                <option value="奥秘 ARCANA|+3|智力">Arcana (+3)</option>
+                <option value="历史 HISTORY|+2|智力">History (+2)</option>
+                <option value="调查 INVESTIGATION|+3|智力">Investigation (+3)</option>
+                <option value="自然 NATURE|+2|智力">Nature (+2)</option>
+                <option value="宗教 RELIGION|+2|智力">Religion (+2)</option>
+                <option value="魔法学 MAGIC|+3|智力">Magic (+3)</option>
+              </optgroup>
+              <optgroup label="👁️ DND Wisdom">
+                <option value="察觉 PERCEPTION|+3|感知">Perception (+3)</option>
+                <option value="洞察 INSIGHT|+2|感知">Insight (+2)</option>
+                <option value="医疗 MEDICINE|+2|感知">Medicine (+2)</option>
+                <option value="求生 SURVIVAL|+2|感知">Survival (+2)</option>
+                <option value="驯兽 ANIMAL HANDLING|+2|感知">Animal Handling (+2)</option>
+              </optgroup>
+              <optgroup label="💬 DND Charisma">
+                <option value="欺骗 DECEPTION|+2|魅力">Deception (+2)</option>
+                <option value="说服 PERSUASION|+3|魅力">Persuasion (+3)</option>
+                <option value="威吓 INTIMIDATION|+2|魅力">Intimidation (+2)</option>
+                <option value="表演 PERFORMANCE|+2|魅力">Performance (+2)</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <h3 class="char-section-title">📜 Character Intro</h3>
+          <textarea class="host-input host-textarea char-intro" id="charIntro" placeholder="Character background, story, abilities..."></textarea>
+
+          <div class="char-actions">
+            <!-- v2.4.29: 一键应用预设模板(COC/DND) -->
+            <button class="host-btn" id="charTemplateBtn" title="Choose a preset character template (COC/DND)">📋 Select Template</button>
+            <button class="host-btn host-btn-primary" id="charSaveBtn">💾 Save Character</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 背包 -->
+      <div class="player-pane" id="playerPaneBag" data-pane="bag" style="display:none;">
+        <div class="player-empty" id="playerBagEmpty">🎒 Inventory is empty - click clue cards on the map to pick them up!</div>
+        <div class="player-bag-list" id="playerBagList"></div>
+        <!-- v2.4.35: 赠金币面板 -->
+        <div class="player-gold-panel" id="playerGoldPanel"></div>
+      </div>
+
+      <!-- 笔记 -->
+      <div class="player-pane" id="playerPaneNote" data-pane="note" style="display:none;">
+        <textarea class="host-input host-textarea player-note" id="playerNoteArea" placeholder="Write your notes here..."></textarea>
+        <button class="host-btn host-btn-primary player-note-save" id="playerNoteSaveBtn">💾 Save Notes</button>
+        <p class="player-note-tip">Notes are only visible to you and the GM</p>
+      </div>
+
+      <!-- v2.4.19: 玩家 ↔ 主持人 私聊 -->
+      <!-- v2.4.21: 重构为 flex column,聊天输入框固定在底部 -->
+      <div class="player-pane player-pane-flex" id="playerPaneChat" data-pane="chat" style="display:none;">
+        <div class="player-chat-log" id="playerChatLog">
+          <div class="player-chat-empty" style="color:#888;text-align:center;padding:30px;">💬 No messages yet - chat privately with the GM</div>
+        </div>
+        <div class="player-chat-input">
+          <input class="host-input" id="playerChatInput" type="text" placeholder="Send a message to the GM..." maxlength="500">
+          <button class="host-btn host-btn-primary" id="playerChatSendBtn">📤 Send</button>
+        </div>
+      </div>
+    </main>
+
+    <footer class="player-footer">
+      <button class="player-btn" id="playerExit">↩ Exit Role</button>
+    </footer>
+
+    <!-- v2.4.45: NPC AI 对话(galgame 风格全屏覆盖) -->
+    <div id="galgameDialog" class="galgame-overlay" style="display:none;">
+      <div class="galgame-bg"></div>
+      <div class="galgame-char" id="galgameChar">
+        <img id="galgameCharImg" alt="" style="display:none;">
+        <div class="galgame-char-placeholder" id="galgameCharPlaceholder"></div>
+      </div>
+      <button class="galgame-close" id="galgameCloseBtn">✕</button>
+      <div class="galgame-dialog-box">
+        <div class="galgame-name-tag" id="galgameNpcName">NPC</div>
+        <div class="galgame-text" id="galgameText"></div>
+        <div class="galgame-thinking" id="galgameThinking" style="display:none;">
+          <span class="galgame-dots">Thinking</span>
+          <span class="galgame-dot">·</span><span class="galgame-dot">·</span><span class="galgame-dot">·</span>
+        </div>
+      </div>
+      <div class="galgame-chat-log" id="galgameChatLog" style="display:none;">
+        <div class="galgame-chat-log-header">
+          <span>📜 Dialog Log</span>
+          <button class="galgame-chat-log-close" id="galgameChatLogClose">✕</button>
+        </div>
+        <div class="galgame-chat-log-body" id="galgameChatLogBody"></div>
+      </div>
+      <div class="galgame-input-area">
+        <button class="galgame-btn-icon" id="galgameVoiceBtn" title="Voice input">🎤</button>
+        <input type="text" class="galgame-input" id="galgameInput" placeholder="Type a message..." maxlength="500">
+        <button class="galgame-btn-send" id="galgameSendBtn">Send</button>
+        <button class="galgame-btn-icon" id="galgameTtsBtn" title="Voice playback">🔊</button>
+        <button class="galgame-btn-icon" id="galgameLogBtn" title="Dialog log">📜</button>
+        <button class="galgame-btn-icon" id="galgameShopBtn" title="NPC Shop">🛒</button>
+      </div>
+      <!-- v2.4.47: NPC 商店面板 -->
+      <div class="galgame-shop" id="galgameShop" style="display:none;">
+        <div class="galgame-shop-header">
+          <span>🛒 <span id="galgameShopNpcName">NPC</span>'s Shop</span>
+          <button class="galgame-shop-refresh" id="galgameShopRefresh" title="Refresh">🔄</button>
+          <button class="galgame-shop-close" id="galgameShopClose">✕</button>
+        </div>
+        <div class="galgame-shop-body" id="galgameShopBody">
+          <div class="galgame-shop-empty">This NPC has no items for sale</div>
+        </div>
+        <div class="galgame-shop-footer">
+          <span>My Gold: <strong id="galgameShopMyGold">0</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- v2.4.23: 玩家端不再展示 NPC 对话弹窗,改为在 pad 端大屏显示(galgame 风格) -->
+  </div>
+
+  <!-- v2.4.29: 角色模板选择弹窗(玩家端) -->
+    <div id="charTemplateModal" class="modal-overlay" style="display:none;">
+      <div class="modal-card" style="max-width:780px;width:90vw;max-height:80vh;display:flex;flex-direction:column;">
+        <button class="modal-close" data-close="charTemplateModal">✕</button>
+        <h3 class="modal-title">📋 Select Character Template</h3>
+        <div class="modal-body" style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;">
+            <span style="font-size:13px;color:#666;">Game system:</span>
+            <select class="host-input" id="charTemplateGameSel" style="width:160px;">
+              <option value="all">All</option>
+              <option value="COC">🎭 COC (Call of Cthulhu)</option>
+              <option value="DND">⚔️ DND (Dungeons & Dragons)</option>
+            </select>
+            <span class="host-hint" style="font-size:11px;color:#888;">Click a card → fill the character sheet (avatar preserved)</span>
+          </div>
+          <div id="charTemplateGrid" style="flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;padding:4px;"></div>
+          <div id="charTemplateEmpty" style="display:none;text-align:center;color:#888;padding:30px;">No templates found</div>
+        </div>
+        <div class="modal-footer">
+          <button class="host-btn" data-close="charTemplateModal">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================== 主持人视图 ====================== -->
+  <div id="hostView" class="view host-view" style="display:none;">
+    <header class="host-header">
+      <div class="host-title-row">
+        <span class="host-emoji">🎭</span>
+        <input class="host-title-input" id="hostTitleInput" type="text" placeholder="Module name" maxlength="40">
+      </div>
+      <div class="host-online">
+        <span class="host-dot" id="hostDotHost" data-role="host" title="Me (GM)">🎭</span>
+        <span class="host-dot" id="hostDotPad" data-role="pad" title="Pad">🖥️</span>
+        <span class="host-dot" id="hostDotP1" data-role="p1" title="Player 1">🔴</span>
+        <span class="host-dot" id="hostDotP2" data-role="p2" title="Player 2">🔵</span>
+      </div>
+      <button class="host-btn-exit" id="hostExit">↩ Exit</button>
+    </header>
+
+    <main class="host-main">
+      <!-- Tab A: 版图 -->
+      <div class="host-tab" id="hostTabMap" data-tab="map">
+        <div class="host-section">
+          <h2 class="host-section-title">🗺️ Current Map</h2>
+          <!-- v2.4.46: 标记模式按钮移到当前版图顶部 -->
+          <div class="host-row host-row-end" id="hostMarkModeRow">
+            <button class="host-btn" id="hostMarkModeToggle" data-pick-mode="mark">📍 Mark Mode: <span id="hostMarkModeLabel">Off</span></button>
+            <button class="host-btn" id="hostCancelPickBtn" style="display:none;">❌ Cancel pick</button>
+            <span class="host-pick-hint" id="hostPickStatus" style="display:none;color:#e67e22;font-weight:bold;"></span>
+          </div>
+          <div class="host-row">
+            <input class="host-input" id="hostMapUrl" type="text" placeholder="Map URL (image/video https://... or /uploads/...)">
+            <button class="host-btn" id="hostMapUploadBtn" title="Upload local image/video">📁 Upload</button>
+            <!-- v2.4.29: 从图库选择版图 -->
+            <button class="host-btn" id="hostMapLibraryBtn" title="Pick from media library">🖼️</button>
+            <input type="file" id="hostMapFile" accept="image/*,video/*" style="display:none;">
+            <button class="host-btn host-btn-primary" id="hostSetMapBtn">Set as Map</button>
+          </div>
+          <div class="host-map-preview" id="hostMapPreview">
+            <div class="host-map-preview-empty" id="hostMapPreviewEmpty">No map set (click blank space = place a marker on the map, Pad shows an arrow that disappears after a few seconds)</div>
+            <img class="host-map-preview-img" id="hostMapPreviewImg" alt="" style="display:none;">
+            <div class="host-map-preview-items" id="hostMapPreviewItems"></div>
+            <!-- v2.4.28: 主持人端版图上显示玩家棋子(只读) -->
+            <div class="host-map-preview-pieces" id="hostMapPreviewPieces"></div>
+            <div class="pad-map-marker-layer" id="hostMapPreviewMarker"></div>
+          </div>
+        </div>
+
+        <div class="host-section">
+          <h2 class="host-section-title">📍 Place Content on Map <small class="host-hint">v2.4: 4+1 types · text/audio/video removed from map</small></h2>
+          <div class="host-row">
+            <select class="host-input" id="hostAddType">
+              <option value="item">🎒 Item (pickable) - rectangular card</option>
+              <option value="clue">🔍 Clue (pickable) - square</option>
+              <option value="event">❓ Event (triggerable) - question mark</option>
+              <option value="image">🖼️ Image (decor) - not pickable</option>
+              <option value="video">🎬 Video (decor) - not pickable</option>
+            </select>
+            <input class="host-input" id="hostAddTitle" type="text" placeholder="Title (required for item/clue/event, shown on pickup/trigger)" maxlength="100">
+          </div>
+          <!-- 图片/物品/线索 通用 -->
+          <div class="host-row">
+            <textarea class="host-input host-textarea" id="hostAddBody" placeholder="Body (item/clue shown in pickup detail, image/video as decor, event as text)"></textarea>
+            <button class="host-btn host-btn-upload" id="hostAddUploadBtn" data-target="hostAddBody" data-accept="image" title="Upload local image">📁</button>
+            <!-- v2.4.41: AI 生成图标(物品/线索/事件/图片 通用) -->
+            <button class="host-btn" id="hostAddAiBtn" data-ai-generate="item" title="AI generate icon">🎨 AI</button>
+            <!-- v2.4.28: 从图库选择图片 -->
+            <!-- v2.4.29: 复用此按钮 - type=image 时只显示图片,type=video 时只显示视频 -->
+            <button class="host-btn host-btn-upload" id="hostAddLibraryBtn" data-target="hostAddBody" title="Pick uploaded/used image or video from library">🖼️</button>
+            <input type="file" id="hostAddFile" data-target="hostAddBody" accept="image/*,video/*" style="display:none;">
+          </div>
+          <!-- 事件专用配置 -->
+          <div class="host-row host-row-event-only" id="hostAddEventConfig" style="display:none;">
+            <label class="host-label">🖼️ Event image URL
+              <input class="host-input" id="hostAddEventImage" type="text" placeholder="(Optional) shown to players https://...">
+            </label>
+            <button class="host-btn" id="hostAddEventImageUploadBtn" data-target="hostAddEventImage" data-accept="image">📁</button>
+            <input type="file" id="hostAddEventImageFile" accept="image/*" style="display:none;">
+          </div>
+          <div class="host-row host-row-event-only" id="hostAddEventConfig2" style="display:none;">
+            <label class="host-label">🎬 Video URL
+              <input class="host-input" id="hostAddEventVideo" type="text" placeholder="(Optional) video https://... length auto">
+            </label>
+            <button class="host-btn" id="hostAddEventVideoUploadBtn" data-target="hostAddEventVideo" data-accept="video">📁</button>
+            <input type="file" id="hostAddEventVideoFile" accept="video/*" style="display:none;">
+            <label class="host-label">🎵 Audio URL
+              <input class="host-input" id="hostAddEventAudio" type="text" placeholder="(Optional) audio https://... length auto">
+            </label>
+            <button class="host-btn" id="hostAddEventAudioUploadBtn" data-target="hostAddEventAudio" data-accept="audio">📁</button>
+            <input type="file" id="hostAddEventAudioFile" accept="audio/*" style="display:none;">
+          </div>
+          <div class="host-row host-row-event-only" id="hostAddEventConfig3" style="display:none;">
+            <label class="host-label">⏱️ Duration (image/text, ms)
+              <input class="host-input-num" id="hostAddEventDuration" type="number" min="500" step="500" value="5000">
+            </label>
+            <label class="host-label">❤️ HP change
+              <input class="host-input-num" id="hostAddEventHp" type="number" step="1" value="0" title="Positive = heal, negative = damage">
+            </label>
+            <label class="host-label">🔵 MP change
+              <input class="host-input-num" id="hostAddEventMp" type="number" step="1" value="0">
+            </label>
+            <label class="host-label">🧠 SAN change
+              <input class="host-input-num" id="hostAddEventSan" type="number" step="1" value="0">
+            </label>
+            <label class="host-label">🎯 Apply effect to
+              <select class="host-input" id="hostAddEventTarget">
+                <option value="pad">Current turn player</option>
+                <option value="p1">Player 1</option>
+                <option value="p2">Player 2</option>
+              </select>
+            </label>
+          </div>
+          <div class="host-row host-row-event-only" id="hostAddEventConfig4" style="display:none;">
+            <label class="host-label">🗺️ Switch to map after trigger
+              <select class="host-input" id="hostAddEventSwitchMap">
+                <option value="">(No switch)</option>
+              </select>
+            </label>
+            <label class="host-label">🧭 Which player to switch
+              <select class="host-input" id="hostAddEventSwitchPlayer">
+                <option value="">(Use effect target)</option>
+                <option value="p1">Player 1</option>
+                <option value="p2">Player 2</option>
+              </select>
+            </label>
+          </div>
+          <!-- v2.4.27: 图片专用 - 玩家点击图片切换版图(棋子不跟) -->
+          <div class="host-row host-row-image-only" id="hostAddImageConfig" style="display:none;">
+            <label class="host-label">🗺️ Switch to map after clicking image
+              <select class="host-input" id="hostAddImageSwitchMap">
+                <option value="">(No switch)</option>
+              </select>
+            </label>
+            <span class="host-hint" style="font-size:11px;color:#888;">Clicking the image auto-jumps; tokens do not follow</span>
+          </div>
+          <!-- v2.4.29: 视频专用 - 玩家点击视频切换版图(同图片) -->
+          <div class="host-row host-row-video-only" id="hostAddVideoConfig" style="display:none;">
+            <label class="host-label">🗺️ Switch to map after clicking video
+              <select class="host-input" id="hostAddVideoSwitchMap">
+                <option value="">(No switch)</option>
+              </select>
+            </label>
+            <span class="host-hint" style="font-size:11px;color:#888;">Clicking the video auto-jumps; tokens do not follow</span>
+          </div>
+          <!-- v2.4.46: 移除手动 X/Y 坐标输入,改为在版图上选点放置 -->
+          <div class="host-row host-row-end">
+            <button class="host-btn host-btn-primary" id="hostPlaceItemBtn" data-pick-mode="placeItem">📍 + Add to Map (pick on map)</button>
+          </div>
+          <p class="host-hint">💡 Click "Add to Map", then click a position on the map to place. Event trigger = media (image/text/video/audio) + effect (HP/MP/SAN change) + optional map switch. Video/audio auto-stop by file length; image/text use the duration.</p>
+
+          <!-- v2.4.47: 快速放置 NPC(也可在「NPC」tab 详细管理) -->
+          <div class="host-place-npc-quick">
+            <div class="host-place-npc-quick-title">👤 Quick Place NPC</div>
+            <div class="host-row">
+              <input class="host-input" id="hostQuickNpcName" type="text" placeholder="NPC name" maxlength="30">
+              <input class="host-input" id="hostQuickNpcAvatarUrl" type="text" placeholder="Avatar URL (optional)">
+              <button class="host-btn" id="hostQuickNpcAvatarUploadBtn" title="Upload avatar">📁</button>
+              <button class="host-btn" id="hostQuickNpcAvatarAiBtn" data-ai-generate="npc" title="AI generate NPC avatar">🎨 AI</button>
+              <input type="file" id="hostQuickNpcAvatarFile" accept="image/*" style="display:none;">
+              <button class="host-btn host-btn-primary" id="hostQuickPlaceNpcBtn">📍 + Add NPC (pick point)</button>
+            </div>
+            <p class="host-hint">💡 Fill in the name and click "Add NPC", then pick a point on the map to place. For detailed management (AI dialog/shop/monitor) switch to the "NPC" tab.</p>
+          </div>
+        </div>
+
+        <div class="host-section host-section-maps">
+          <h2 class="host-section-title">🗺️ Multi-Map Management <small class="host-hint">Each map has its own items / npcs / player positions / BGM</small></h2>
+          <div class="host-row">
+            <input class="host-input" id="hostNewMapName" type="text" placeholder="New map name (e.g. Underground Cellar)" maxlength="30">
+            <button class="host-btn host-btn-primary" id="hostAddMapBtn">+ New Map</button>
+            <!-- v2.4.41: AI 生成版图(自动创建新版图 + 设为 activeMap + setMapUrl) -->
+            <button class="host-btn" id="hostAddMapAiBtn" data-ai-generate="map" title="AI generate map background">🎨 AI Generate Map</button>
+          </div>
+          <div class="host-maps-list" id="hostMapsList">
+            <div class="host-mini-empty">No maps yet</div>
+          </div>
+          <div class="host-row" id="hostFollowList" style="margin-top: 10px; flex-wrap:wrap;">
+            <label class="host-check" data-pid="p1">
+              <input type="checkbox" id="hostFollowP1Toggle" checked> On map switch Player 1 follows
+            </label>
+            <label class="host-check" data-pid="p2">
+              <input type="checkbox" id="hostFollowP2Toggle" checked> Player 2 follows
+            </label>
+            <label class="host-check" data-pid="p3">
+              <input type="checkbox" id="hostFollowP3Toggle" checked> Player 3 follows
+            </label>
+            <label class="host-check" data-pid="p4">
+              <input type="checkbox" id="hostFollowP4Toggle" checked> Player 4 follows
+            </label>
+            <label class="host-check" data-pid="p5">
+              <input type="checkbox" id="hostFollowP5Toggle" checked> Player 5 follows
+            </label>
+            <label class="host-check" data-pid="p6">
+              <input type="checkbox" id="hostFollowP6Toggle" checked> Player 6 follows
+            </label>
+          </div>
+          <p class="host-hint">💡 The first time a player enters a map they spawn at the "Spawn Point" you set.</p>
+          <!-- v2.4.19: 出生点改用「点击版图选点」模式,不再手动输入 X/Y -->
+          <div class="host-row host-row-end" id="hostStartPickList">
+            <button class="host-btn" id="hostPickStartP1Btn" data-pid="p1" data-pick-mode="startP1">📍 P1 Spawn</button>
+            <button class="host-btn" id="hostPickStartP2Btn" data-pid="p2" data-pick-mode="startP2">📍 P2 Spawn</button>
+            <button class="host-btn" id="hostPickStartP3Btn" data-pid="p3" data-pick-mode="startP3">📍 P3 Spawn</button>
+            <button class="host-btn" id="hostPickStartP4Btn" data-pid="p4" data-pick-mode="startP4">📍 P4 Spawn</button>
+            <button class="host-btn" id="hostPickStartP5Btn" data-pid="p5" data-pick-mode="startP5">📍 P5 Spawn</button>
+            <button class="host-btn" id="hostPickStartP6Btn" data-pid="p6" data-pick-mode="startP6">📍 P6 Spawn</button>
+            <span class="host-pick-hint" id="hostPickStartHint" style="display:none;color:#e67e22;font-weight:bold;"></span>
+          </div>
+          <div class="host-row" id="hostStartCoordList" style="font-size:12px;color:#7f8c8d;flex-wrap:wrap;gap:5px;">
+            <span data-pid="p1">P1: (<span id="hostStartP1Display">0.50, 0.50</span>)</span>
+            <span data-pid="p2">P2: (<span id="hostStartP2Display">0.50, 0.50</span>)</span>
+            <span data-pid="p3">P3: (<span id="hostStartP3Display">0.50, 0.50</span>)</span>
+            <span data-pid="p4">P4: (<span id="hostStartP4Display">0.50, 0.50</span>)</span>
+            <span data-pid="p5">P5: (<span id="hostStartP5Display">0.50, 0.50</span>)</span>
+            <span data-pid="p6">P6: (<span id="hostStartP6Display">0.50, 0.50</span>)</span>
+          </div>
+        </div>
+
+        <!-- v2.4.19: 玩家位置(从玩家列移到版图列),使用「点击版图选点」 -->
+        <div class="host-section">
+          <h2 class="host-section-title">🧭 Player Position <small class="host-hint">Set player position via "pick on map" (optional) + move to map</small></h2>
+          <div class="host-row host-row-end">
+            <label class="host-label">👤 Player
+              <select class="host-input" id="hostMovePlayer">
+                <option value="p1">🔴 Player 1</option>
+                <option value="p2">🔵 Player 2</option>
+                <option value="p3">🟢 Player 3</option>
+                <option value="p4">🟡 Player 4</option>
+                <option value="p5">🟣 Player 5</option>
+                <option value="p6">🟠 Player 6</option>
+              </select>
+            </label>
+            <label class="host-label">🗺️ Target map
+              <select class="host-input" id="hostMovePlayerMap">
+                <option value="">(Pick)</option>
+              </select>
+            </label>
+            <button class="host-btn" id="hostPickMovePosBtn" data-pick-mode="movePos">📍 Pick position on map</button>
+            <span class="host-pick-hint" id="hostPickMoveHint" style="display:none;color:#e67e22;font-weight:bold;"></span>
+            <button class="host-btn host-btn-primary" id="hostMovePlayerBtn">🧭 Move</button>
+          </div>
+          <div class="host-row" style="font-size:12px;color:#7f8c8d;">
+            <span>Target position: (<span id="hostMovePosDisplay">Not selected</span>)</span>
+            <span style="margin-left:20px;">Current P1 position: <span id="hostP1CurrentMap">-</span></span>
+            <span style="margin-left:20px;">Current P2 position: <span id="hostP2CurrentMap">-</span></span>
+          </div>
+        </div>
+
+        <!-- v2.4.46: 「标记 & 放置」section 已移除,按钮分别移到「当前版图」「在版图上放内容」「NPC 管理」 -->
+        <!-- v2.4.18: 保存 / 导入 / 导出 (从 玩家列 移到 版图列) -->
+        <div class="host-section">
+          <h2 class="host-section-title">💾 Save / Export / Import <small class="host-hint">For pre-setup / resuming after interruption</small></h2>
+          <div class="host-row">
+            <button class="host-btn host-btn-primary" id="hostExportMapsBtn">📤 Export Maps (download JSON)</button>
+            <input type="file" id="hostImportMapsFile" accept=".json,application/json" style="display:none;">
+            <button class="host-btn" id="hostImportMapsBtn">📥 Import from JSON</button>
+          </div>
+          <p class="host-hint">💡 Export contents: all maps (items/npcs/player positions/BGM/spawn points), each player's current map, the active map.</p>
+        </div>
+
+        <div class="host-section">
+          <h2 class="host-section-title">📋 Map Items (<span id="hostMapItemsCount">0</span>) <small class="host-hint">Click to select, then scale below</small></h2>
+          <div class="host-mini-list" id="hostMapItemsList">
+            <div class="host-mini-empty">No content on the map yet</div>
+          </div>
+          <div class="host-scale-panel" id="hostScalePanel" style="display:none;">
+            <label>Scale <input type="range" id="hostScaleRange" min="0.3" max="3" step="0.05" value="1"></label>
+            <span id="hostScaleValue">1.00×</span>
+            <button class="host-btn" id="hostScaleResetBtn">Reset 1×</button>
+          </div>
+        </div>
+
+        <!-- v2.4.47: NPC 管理 section 已移到独立的 NPC tab -->
+
+        <!-- v2.4.19: 背景音乐(BGM) 移至版图栏底部 -->
+        <div class="host-section">
+          <h2 class="host-section-title">🎵 Current Map BGM <small class="host-hint" id="hostBgmCurrentMapLabel">(Current map)</small></h2>
+          <div class="host-row">
+            <input class="host-input" id="hostBgmUrl" type="text" placeholder="Music URL (https://... or /uploads/...)">
+            <button class="host-btn" id="hostBgmUploadBtn" title="Upload local audio">📁 Upload</button>
+            <input type="file" id="hostBgmFile" accept="audio/*" style="display:none;">
+          </div>
+          <div class="host-row">
+            <input class="host-input" id="hostBgmTitle" type="text" placeholder="Title (e.g. Tavern Ambience)" maxlength="50">
+          </div>
+          <div class="host-row host-row-end">
+            <label class="host-label">Volume
+              <input class="host-input-num" id="hostBgmVolume" type="number" min="0" max="1" step="0.05" value="0.5">
+            </label>
+            <button class="host-btn host-btn-primary" id="hostSetBgmBtn">▶️ Set & Play</button>
+            <button class="host-btn" id="hostPauseBgmBtn" title="Pause BGM (Pad side)">⏸ Pause</button>
+            <button class="host-btn" id="hostResumeBgmBtn" title="Resume BGM (Pad side)" style="display:none;">▶ Resume</button>
+            <button class="host-btn host-btn-danger" id="hostStopBgmBtn">⏹ Clear</button>
+          </div>
+          <div class="host-row host-row-end">
+            <label class="host-label">Volume slider
+              <input class="host-input-range" id="hostBgmVolumeRange" type="range" min="0" max="1" step="0.05" value="0.5">
+              <span id="hostBgmVolumeLabel" class="host-volume-label">50%</span>
+            </label>
+            <span class="host-bgm-hint">🔊 Pad auto-plays this BGM by default</span>
+          </div>
+          <div class="host-row">
+            <div class="host-bgm-status" id="hostBgmStatus">Current: None</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab B: 发到桌面 -->
+      <div class="host-tab" id="hostTabPad" data-tab="pad" style="display:none;">
+        <div class="host-section">
+          <h2 class="host-section-title">📢 Push to Feed</h2>
+          <div class="host-row">
+            <select class="host-input" id="hostPadType">
+              <option value="text">📝 Text</option>
+              <option value="image">🖼️ Image</option>
+              <option value="audio">🎵 Audio</option>
+              <option value="video">🎬 Video</option>
+            </select>
+            <input class="host-input" id="hostPadTitle" type="text" placeholder="Title (optional)" maxlength="100">
+          </div>
+          <div class="host-row">
+            <textarea class="host-input host-textarea" id="hostPadBody" placeholder="Body / URL..."></textarea>
+            <button class="host-btn host-btn-upload" id="hostPadUploadBtn" data-target="hostPadBody" data-accept="image|audio|video" title="Upload file">📁</button>
+            <button class="host-btn" id="hostPadAiBtn" data-ai-generate="item" title="AI generate image">🎨 AI</button>
+            <input type="file" id="hostPadFile" data-target="hostPadBody" accept="image/*,audio/*,video/*" style="display:none;">
+          </div>
+          <div class="host-row host-row-end">
+            <button class="host-btn host-btn-primary" id="hostSendPadBtn">📤 Send to Feed</button>
+          </div>
+        </div>
+        <div class="host-section">
+          <h2 class="host-section-title">📥 Current Feed (<span id="hostPadFeedCount">0</span>)</h2>
+          <div class="host-mini-list" id="hostPadFeedList">
+            <div class="host-mini-empty">Feed is empty</div>
+          </div>
+        </div>
+
+        <!-- v2.4.18: 主持人骰子 (整合到桌面列) -->
+        <div class="host-section">
+          <h2 class="host-section-title">🎲 GM (KP) Dice <small class="host-hint">Public roll = visible to Pad players, private roll = GM history only</small></h2>
+          <div class="host-dice-panel">
+            <label class="host-dice-public-toggle">
+              <input type="checkbox" id="hostDicePublicToggle">
+              <span class="host-dice-public-slider"></span>
+              <span class="host-dice-public-label">Public mode</span>
+            </label>
+            <div class="host-dice-presets">
+              <button class="dice-btn" data-host-dice="4">D4</button>
+              <button class="dice-btn" data-host-dice="6">D6</button>
+              <button class="dice-btn" data-host-dice="8">D8</button>
+              <button class="dice-btn" data-host-dice="10">D10</button>
+              <button class="dice-btn" data-host-dice="12">D12</button>
+              <button class="dice-btn" data-host-dice="20">D20</button>
+              <button class="dice-btn" data-host-dice="100">D100</button>
+            </div>
+            <div class="host-dice-custom">
+              <input class="dice-input" id="hostDiceNotation" type="text" placeholder="Custom: 2D6+1D20+3" maxlength="40">
+              <button class="dice-roll-btn" id="hostDiceRollBtn">🎲 Roll</button>
+            </div>
+            <details class="host-dice-log-details">
+              <summary>📜 GM Dice History (<span id="hostDiceLogCount">0</span>)</summary>
+              <div class="host-dice-log" id="hostDiceLog">
+                <div class="host-mini-empty">No dice history yet</div>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <!-- v2.4.19: BGM 已移至版图栏底部 -->
+      </div>
+
+      <!-- v2.4.47: Tab C: NPC 管理(独立功能卡,整合所有 NPC 相关功能) -->
+      <div class="host-tab" id="hostTabNpc" data-tab="npc" style="display:none;">
+        <!-- 添加 NPC -->
+        <div class="host-section">
+          <h2 class="host-section-title">👤 Add NPC <small class="host-hint">Fill in name/avatar, then click "Add NPC" to pick a point on the map</small></h2>
+          <div class="host-row">
+            <input class="host-input" id="hostNpcName" type="text" placeholder="NPC name" maxlength="30">
+            <input class="host-input" id="hostNpcAvatarUrl" type="text" placeholder="Avatar URL (optional)">
+            <button class="host-btn" id="hostNpcAvatarUploadBtn" title="Upload avatar">📁</button>
+            <button class="host-btn" id="hostNpcAvatarAiBtn" data-ai-generate="npc" title="AI generate NPC avatar">🎨 AI</button>
+            <input type="file" id="hostNpcAvatarFile" accept="image/*" style="display:none;">
+            <button class="host-btn host-btn-primary" id="hostPlaceNpcBtn" data-pick-mode="placeNpc">📍 + Add NPC (pick on map)</button>
+          </div>
+          <p class="host-hint">💡 Click "Add NPC", then click a position on the map to place. You can also drag the NPC on the map to move it.</p>
+        </div>
+
+        <!-- NPC 列表 -->
+        <div class="host-section">
+          <h2 class="host-section-title">📋 NPC List (<span id="hostNpcCount">0</span>) <small class="host-hint">Click an NPC to open the editor (info/AI dialog/shop/monitor)</small></h2>
+          <div class="host-npc-list" id="hostNpcList">
+            <div class="host-mini-empty">No NPCs yet</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab D: 玩家 (v2.4.18: 改名为"玩家",吸收原"线索"所有内容 + HP 调整) -->
+      <div class="host-tab" id="hostTabPlayer" data-tab="player" style="display:none;">
+        <!-- v2.4.34: 本局游戏玩家人数设定 -->
+        <div class="host-section host-section-count">
+          <h2 class="host-section-title">🎮 Player Count <small class="host-hint">After setting: only these players can join; turn/follow/UI will be limited</small></h2>
+          <div class="host-row host-row-end">
+            <label class="host-label">Players this session:
+              <select class="host-input" id="hostMaxPlayersSel">
+                <option value="1">1 player</option>
+                <option value="2">2 players</option>
+                <option value="3">3 players</option>
+                <option value="4">4 players</option>
+                <option value="5">5 players</option>
+                <option value="6" selected>6 players (default)</option>
+              </select>
+            </label>
+            <button class="host-btn host-btn-primary" id="hostApplyMaxPlayersBtn">✅ Apply</button>
+            <span class="host-hint" id="hostMaxPlayersHint" style="margin-left:8px;">Current: 6 players</span>
+          </div>
+        </div>
+        <div class="host-section">
+          <h2 class="host-section-title">💔 Damage / Heal / Mana / Sanity <small class="host-hint">Select attribute → enter value → click -/+</small></h2>
+          <div class="host-hp-panel" id="hostHpPanel">
+            <!-- v2.4.33: 动态行 - 只显示已加入玩家 -->
+            <div class="host-hp-row" data-pid="p1">
+              <span class="host-hp-target">🔴 Player 1</span>
+              <select class="host-input host-input-sm" data-stat-target="p1">
+                <option value="hp">❤️ HP</option>
+                <option value="mp">🔵 MP</option>
+                <option value="san">🧠 SAN</option>
+              </select>
+              <span class="host-hp-display" id="hostP1StatDisplay">10/10</span>
+              <input class="host-input-num" id="hostP1StatDelta" type="number" value="1" min="0" step="1" title="Value">
+              <button class="host-btn host-btn-danger" data-stat-delta-target="p1" data-stat-delta="-1">- Decrease</button>
+              <button class="host-btn" data-stat-delta-target="p1" data-stat-delta="1">+ Increase</button>
+            </div>
+            <div class="host-hp-row" data-pid="p2">
+              <span class="host-hp-target">🔵 Player 2</span>
+              <select class="host-input host-input-sm" data-stat-target="p2">
+                <option value="hp">❤️ HP</option>
+                <option value="mp">🔵 MP</option>
+                <option value="san">🧠 SAN</option>
+              </select>
+              <span class="host-hp-display" id="hostP2StatDisplay">10/10</span>
+              <input class="host-input-num" id="hostP2StatDelta" type="number" value="1" min="0" step="1" title="Value">
+              <button class="host-btn host-btn-danger" data-stat-delta-target="p2" data-stat-delta="-1">- Decrease</button>
+              <button class="host-btn" data-stat-delta-target="p2" data-stat-delta="1">+ Increase</button>
+            </div>
+            <div class="host-hp-row" data-pid="p3">
+              <span class="host-hp-target">🟢 Player 3</span>
+              <select class="host-input host-input-sm" data-stat-target="p3">
+                <option value="hp">❤️ HP</option>
+                <option value="mp">🔵 MP</option>
+                <option value="san">🧠 SAN</option>
+              </select>
+              <span class="host-hp-display" id="hostP3StatDisplay">10/10</span>
+              <input class="host-input-num" id="hostP3StatDelta" type="number" value="1" min="0" step="1" title="Value">
+              <button class="host-btn host-btn-danger" data-stat-delta-target="p3" data-stat-delta="-1">- Decrease</button>
+              <button class="host-btn" data-stat-delta-target="p3" data-stat-delta="1">+ Increase</button>
+            </div>
+            <div class="host-hp-row" data-pid="p4">
+              <span class="host-hp-target">🟡 Player 4</span>
+              <select class="host-input host-input-sm" data-stat-target="p4">
+                <option value="hp">❤️ HP</option>
+                <option value="mp">🔵 MP</option>
+                <option value="san">🧠 SAN</option>
+              </select>
+              <span class="host-hp-display" id="hostP4StatDisplay">10/10</span>
+              <input class="host-input-num" id="hostP4StatDelta" type="number" value="1" min="0" step="1" title="Value">
+              <button class="host-btn host-btn-danger" data-stat-delta-target="p4" data-stat-delta="-1">- Decrease</button>
+              <button class="host-btn" data-stat-delta-target="p4" data-stat-delta="1">+ Increase</button>
+            </div>
+            <div class="host-hp-row" data-pid="p5">
+              <span class="host-hp-target">🟣 Player 5</span>
+              <select class="host-input host-input-sm" data-stat-target="p5">
+                <option value="hp">❤️ HP</option>
+                <option value="mp">🔵 MP</option>
+                <option value="san">🧠 SAN</option>
+              </select>
+              <span class="host-hp-display" id="hostP5StatDisplay">10/10</span>
+              <input class="host-input-num" id="hostP5StatDelta" type="number" value="1" min="0" step="1" title="Value">
+              <button class="host-btn host-btn-danger" data-stat-delta-target="p5" data-stat-delta="-1">- Decrease</button>
+              <button class="host-btn" data-stat-delta-target="p5" data-stat-delta="1">+ Increase</button>
+            </div>
+            <div class="host-hp-row" data-pid="p6">
+              <span class="host-hp-target">🟠 Player 6</span>
+              <select class="host-input host-input-sm" data-stat-target="p6">
+                <option value="hp">❤️ HP</option>
+                <option value="mp">🔵 MP</option>
+                <option value="san">🧠 SAN</option>
+              </select>
+              <span class="host-hp-display" id="hostP6StatDisplay">10/10</span>
+              <input class="host-input-num" id="hostP6StatDelta" type="number" value="1" min="0" step="1" title="Value">
+              <button class="host-btn host-btn-danger" data-stat-delta-target="p6" data-stat-delta="-1">- Decrease</button>
+              <button class="host-btn" data-stat-delta-target="p6" data-stat-delta="1">+ Increase</button>
+            </div>
+            <div class="host-empty-rows" id="hostHpEmpty" style="display:none;">⏳ Waiting for players to join…</div>
+            <p class="host-hint">💡 Tip: choose an attribute (HP/MP/SAN), enter a value (e.g. 5), click - Decrease = minus 5; + Increase = plus 5</p>
+          </div>
+        </div>
+
+        <!-- v2.4.20: 旧的纯 HP 增减按钮已废弃 -->
+        <div style="display:none;">
+          <span id="hostP1HpDisplay">10/10</span>
+          <span id="hostP2HpDisplay">10/10</span>
+          <span id="hostP3HpDisplay">10/10</span>
+          <span id="hostP4HpDisplay">10/10</span>
+          <span id="hostP5HpDisplay">10/10</span>
+          <span id="hostP6HpDisplay">10/10</span>
+        </div>
+
+        <!-- v2.4.19: 主持人可设置玩家起始血量/蓝量/SAN值 -->
+        <!-- v2.4.31: 增加金币字段 -->
+        <div class="host-section">
+          <h2 class="host-section-title">🩸 Player Initial Attributes <small class="host-hint">Set player's starting HP / MP / SAN / 💰Gold (overwrites current value)</small></h2>
+          <div class="host-row" id="hostInitPropsList">
+            <div class="host-row" data-pid="p1">
+              <span class="host-hp-target">🔴 Player 1</span>
+              <label class="host-label">HP <input class="host-input-num" id="hostP1InitHp" type="number" value="10" min="0" step="1"></label>
+              <label class="host-label">MP <input class="host-input-num" id="hostP1InitMp" type="number" value="10" min="0" step="1"></label>
+              <label class="host-label">SAN <input class="host-input-num" id="hostP1InitSan" type="number" value="50" min="0" step="1"></label>
+              <label class="host-label host-label-gold">💰 <input class="host-input-num" id="hostP1InitGold" type="number" value="100" min="0" max="999999" step="1"></label>
+              <button class="host-btn host-btn-primary" id="hostSetP1InitBtn">Apply P1</button>
+            </div>
+            <div class="host-row" data-pid="p2">
+              <span class="host-hp-target">🔵 Player 2</span>
+              <label class="host-label">HP <input class="host-input-num" id="hostP2InitHp" type="number" value="10" min="0" step="1"></label>
+              <label class="host-label">MP <input class="host-input-num" id="hostP2InitMp" type="number" value="10" min="0" step="1"></label>
+              <label class="host-label">SAN <input class="host-input-num" id="hostP2InitSan" type="number" value="50" min="0" step="1"></label>
+              <label class="host-label host-label-gold">💰 <input class="host-input-num" id="hostP2InitGold" type="number" value="100" min="0" max="999999" step="1"></label>
+              <button class="host-btn host-btn-primary" id="hostSetP2InitBtn">Apply P2</button>
+            </div>
+            <div class="host-row" data-pid="p3">
+              <span class="host-hp-target">🟢 Player 3</span>
+              <label class="host-label">HP <input class="host-input-num" id="hostP3InitHp" type="number" value="10" min="0" step="1"></label>
+              <label class="host-label">MP <input class="host-input-num" id="hostP3InitMp" type="number" value="10" min="0" step="1"></label>
+              <label class="host-label">SAN <input class="host-input-num" id="hostP3InitSan" type="number" value="50" min="0" step="1"></label>
+              <label class="host-label host-label-gold">💰 <input class="host-input-num" id="hostP3InitGold" type="number" value="100" min="0" max="999999" step="1"></label>
+              <button class="host-btn host-btn-primary" id="hostSetP3InitBtn">Apply P3</button>
+            </div>
+            <div class="host-row" data-pid="p4">
+              <span class="host-hp-target">🟡 Player 4</span>
+              <label class="host-label">HP <input class="host-input-num" id="hostP4InitHp" type="number" value="10" min="0" step="1"></label>
+              <label class="host-label">MP <input class="host-input-num" id="hostP4InitMp" type="number" value="10" min="0" step="1"></label>
+              <label class="host-label">SAN <input class="host-input-num" id="hostP4InitSan" type="number" value="50" min="0" step="1"></label>
+              <label class="host-label host-label-gold">💰 <input class="host-input-num" id="hostP4InitGold" type="number" value="100" min="0" max="999999" step="1"></label>
+              <button class="host-btn host-btn-primary" id="hostSetP4InitBtn">Apply P4</button>
+            </div>
+            <div class="host-row" data-pid="p5">
+              <span class="host-hp-target">🟣 Player 5</span>
+              <label class="host-label">HP <input class="host-input-num" id="hostP5InitHp" type="number" value="10" min="0" step="1"></label>
+              <label class="host-label">MP <input class="host-input-num" id="hostP5InitMp" type="number" value="10" min="0" step="1"></label>
+              <label class="host-label">SAN <input class="host-input-num" id="hostP5InitSan" type="number" value="50" min="0" step="1"></label>
+              <label class="host-label host-label-gold">💰 <input class="host-input-num" id="hostP5InitGold" type="number" value="100" min="0" max="999999" step="1"></label>
+              <button class="host-btn host-btn-primary" id="hostSetP5InitBtn">Apply P5</button>
+            </div>
+            <div class="host-row" data-pid="p6">
+              <span class="host-hp-target">🟠 Player 6</span>
+              <label class="host-label">HP <input class="host-input-num" id="hostP6InitHp" type="number" value="10" min="0" step="1"></label>
+              <label class="host-label">MP <input class="host-input-num" id="hostP6InitMp" type="number" value="10" min="0" step="1"></label>
+              <label class="host-label">SAN <input class="host-input-num" id="hostP6InitSan" type="number" value="50" min="0" step="1"></label>
+              <label class="host-label host-label-gold">💰 <input class="host-input-num" id="hostP6InitGold" type="number" value="100" min="0" max="999999" step="1"></label>
+              <button class="host-btn host-btn-primary" id="hostSetP6InitBtn">Apply P6</button>
+            </div>
+            <div class="host-empty-rows" id="hostInitEmpty" style="display:none;">⏳ Waiting for players to join…</div>
+          </div>
+          <p class="host-hint">💡 Tip: clicking "Apply" forces the player's current HP/MP/SAN/💰Gold to the value you set.</p>
+        </div>
+
+        <!-- v2.4.31: 主持人金币调整面板(快速加/减金币) -->
+        <!-- v2.4.33: 按 online 动态显示 -->
+        <div class="host-section">
+          <h2 class="host-section-title">💰 Player Gold Adjustment <small class="host-hint">Quest rewards / purchase deductions / found coins</small></h2>
+          <div id="hostGoldList">
+          <div class="host-row" data-pid="p1">
+            <span class="host-hp-target">🔴 Player 1</span>
+            <span class="host-gold-current" id="hostP1GoldCurrent">💰 --</span>
+            <button class="host-btn host-btn-mini" data-gold-action="minus" data-gold-player="p1" data-gold-amount="10" title="Deduct 10 gold">-10</button>
+            <button class="host-btn host-btn-mini" data-gold-action="minus" data-gold-player="p1" data-gold-amount="50" title="Deduct 50 gold">-50</button>
+            <input class="host-input-num host-gold-custom" id="hostP1GoldDelta" type="number" value="0" step="1" placeholder="Custom delta" title="Custom delta (positive=add, negative=subtract)">
+            <button class="host-btn host-btn-mini" data-gold-action="plus" data-gold-player="p1" data-gold-amount="10" title="Add 10 gold">+10</button>
+            <button class="host-btn host-btn-mini" data-gold-action="plus" data-gold-player="p1" data-gold-amount="50" title="Add 50 gold">+50</button>
+            <button class="host-btn host-btn-primary" data-gold-action="custom" data-gold-player="p1" title="Apply custom delta">Apply</button>
+          </div>
+          <div class="host-row" data-pid="p2">
+            <span class="host-hp-target">🔵 Player 2</span>
+            <span class="host-gold-current" id="hostP2GoldCurrent">💰 --</span>
+            <button class="host-btn host-btn-mini" data-gold-action="minus" data-gold-player="p2" data-gold-amount="10" title="Deduct 10 gold">-10</button>
+            <button class="host-btn host-btn-mini" data-gold-action="minus" data-gold-player="p2" data-gold-amount="50" title="Deduct 50 gold">-50</button>
+            <input class="host-input-num host-gold-custom" id="hostP2GoldDelta" type="number" value="0" step="1" placeholder="Custom delta" title="Custom delta (positive=add, negative=subtract)">
+            <button class="host-btn host-btn-mini" data-gold-action="plus" data-gold-player="p2" data-gold-amount="10" title="Add 10 gold">+10</button>
+            <button class="host-btn host-btn-mini" data-gold-action="plus" data-gold-player="p2" data-gold-amount="50" title="Add 50 gold">+50</button>
+            <button class="host-btn host-btn-primary" data-gold-action="custom" data-gold-player="p2" title="Apply custom delta">Apply</button>
+          </div>
+          <div class="host-row" data-pid="p3">
+            <span class="host-hp-target">🟢 Player 3</span>
+            <span class="host-gold-current" id="hostP3GoldCurrent">💰 --</span>
+            <button class="host-btn host-btn-mini" data-gold-action="minus" data-gold-player="p3" data-gold-amount="10" title="Deduct 10 gold">-10</button>
+            <button class="host-btn host-btn-mini" data-gold-action="minus" data-gold-player="p3" data-gold-amount="50" title="Deduct 50 gold">-50</button>
+            <input class="host-input-num host-gold-custom" id="hostP3GoldDelta" type="number" value="0" step="1" placeholder="Custom delta" title="Custom delta (positive=add, negative=subtract)">
+            <button class="host-btn host-btn-mini" data-gold-action="plus" data-gold-player="p3" data-gold-amount="10" title="Add 10 gold">+10</button>
+            <button class="host-btn host-btn-mini" data-gold-action="plus" data-gold-player="p3" data-gold-amount="50" title="Add 50 gold">+50</button>
+            <button class="host-btn host-btn-primary" data-gold-action="custom" data-gold-player="p3" title="Apply custom delta">Apply</button>
+          </div>
+          <div class="host-row" data-pid="p4">
+            <span class="host-hp-target">🟡 Player 4</span>
+            <span class="host-gold-current" id="hostP4GoldCurrent">💰 --</span>
+            <button class="host-btn host-btn-mini" data-gold-action="minus" data-gold-player="p4" data-gold-amount="10" title="Deduct 10 gold">-10</button>
+            <button class="host-btn host-btn-mini" data-gold-action="minus" data-gold-player="p4" data-gold-amount="50" title="Deduct 50 gold">-50</button>
+            <input class="host-input-num host-gold-custom" id="hostP4GoldDelta" type="number" value="0" step="1" placeholder="Custom delta" title="Custom delta (positive=add, negative=subtract)">
+            <button class="host-btn host-btn-mini" data-gold-action="plus" data-gold-player="p4" data-gold-amount="10" title="Add 10 gold">+10</button>
+            <button class="host-btn host-btn-mini" data-gold-action="plus" data-gold-player="p4" data-gold-amount="50" title="Add 50 gold">+50</button>
+            <button class="host-btn host-btn-primary" data-gold-action="custom" data-gold-player="p4" title="Apply custom delta">Apply</button>
+          </div>
+          <div class="host-row" data-pid="p5">
+            <span class="host-hp-target">🟣 Player 5</span>
+            <span class="host-gold-current" id="hostP5GoldCurrent">💰 --</span>
+            <button class="host-btn host-btn-mini" data-gold-action="minus" data-gold-player="p5" data-gold-amount="10" title="Deduct 10 gold">-10</button>
+            <button class="host-btn host-btn-mini" data-gold-action="minus" data-gold-player="p5" data-gold-amount="50" title="Deduct 50 gold">-50</button>
+            <input class="host-input-num host-gold-custom" id="hostP5GoldDelta" type="number" value="0" step="1" placeholder="Custom delta" title="Custom delta (positive=add, negative=subtract)">
+            <button class="host-btn host-btn-mini" data-gold-action="plus" data-gold-player="p5" data-gold-amount="10" title="Add 10 gold">+10</button>
+            <button class="host-btn host-btn-mini" data-gold-action="plus" data-gold-player="p5" data-gold-amount="50" title="Add 50 gold">+50</button>
+            <button class="host-btn host-btn-primary" data-gold-action="custom" data-gold-player="p5" title="Apply custom delta">Apply</button>
+          </div>
+          <div class="host-row" data-pid="p6">
+            <span class="host-hp-target">🟠 Player 6</span>
+            <span class="host-gold-current" id="hostP6GoldCurrent">💰 --</span>
+            <button class="host-btn host-btn-mini" data-gold-action="minus" data-gold-player="p6" data-gold-amount="10" title="Deduct 10 gold">-10</button>
+            <button class="host-btn host-btn-mini" data-gold-action="minus" data-gold-player="p6" data-gold-amount="50" title="Deduct 50 gold">-50</button>
+            <input class="host-input-num host-gold-custom" id="hostP6GoldDelta" type="number" value="0" step="1" placeholder="Custom delta" title="Custom delta (positive=add, negative=subtract)">
+            <button class="host-btn host-btn-mini" data-gold-action="plus" data-gold-player="p6" data-gold-amount="10" title="Add 10 gold">+10</button>
+            <button class="host-btn host-btn-mini" data-gold-action="plus" data-gold-player="p6" data-gold-amount="50" title="Add 50 gold">+50</button>
+            <button class="host-btn host-btn-primary" data-gold-action="custom" data-gold-player="p6" title="Apply custom delta">Apply</button>
+          </div>
+          <div class="host-empty-rows" id="hostGoldEmpty" style="display:none;">⏳ Waiting for players to join…</div>
+          </div>
+          <p class="host-hint">💡 Quick buttons: ±10/±50 are common amounts; enter a custom value (positive or negative) and click "Apply".</p>
+        </div>
+
+        <!-- v2.4.20: 主持人回合控制已移除(自动跟随) -->
+
+        <div class="host-section">
+          <h2 class="host-section-title">📨 Send Content to Players <small class="host-hint">Supports text/image/audio/script (link) · send video to the big screen</small></h2>
+          <div class="host-row host-clue-target-row">
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostPlayerSendTarget" value="p1" checked> 🔴 Player 1
+            </label>
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostPlayerSendTarget" value="p2"> 🔵 Player 2
+            </label>
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostPlayerSendTarget" value="p3"> 🟢 Player 3
+            </label>
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostPlayerSendTarget" value="p4"> 🟡 Player 4
+            </label>
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostPlayerSendTarget" value="p5"> 🟣 Player 5
+            </label>
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostPlayerSendTarget" value="p6"> 🟠 Player 6
+            </label>
+            <select class="host-input host-input-sm" id="hostPlayerSendType">
+              <option value="text">📝 Text</option>
+              <option value="image">🖼️ Image</option>
+              <option value="audio">🎵 Audio</option>
+              <option value="script">📜 Script (link)</option>
+            </select>
+          </div>
+          <div class="host-row">
+            <input class="host-input" id="hostPlayerSendTitle" type="text" placeholder="Title (optional, may be blank for script type)" maxlength="100">
+          </div>
+          <div class="host-row">
+            <textarea class="host-input host-textarea" id="hostPlayerSendBody" placeholder="Body or script URL..."></textarea>
+            <button class="host-btn host-btn-upload" id="hostPlayerSendUploadBtn" data-target="hostPlayerSendBody" data-accept="image|audio" title="Upload local file">📁</button>
+            <input type="file" id="hostPlayerSendFile" data-target="hostPlayerSendBody" accept="image/*,audio/*" style="display:none;">
+          </div>
+          <div class="host-row host-row-end">
+            <button class="host-btn host-btn-primary" id="hostPlayerSendBtn">📤 Send to Players</button>
+          </div>
+        </div>
+
+        <!-- v2.4.19: 玩家 ↔ 主持人 私聊 -->
+        <div class="host-section">
+          <h2 class="host-section-title">💬 Player Private Chat <small class="host-hint">Text chat privately with each player (independent channel per player) · your messages also show here</small></h2>
+          <div class="host-row host-row-end">
+            <label class="host-label">👤 Select player
+              <select class="host-input" id="hostChatTarget">
+                <option value="p1">🔴 Player 1</option>
+                <option value="p2">🔵 Player 2</option>
+                <option value="p3">🟢 Player 3</option>
+                <option value="p4">🟡 Player 4</option>
+                <option value="p5">🟣 Player 5</option>
+                <option value="p6">🟠 Player 6</option>
+              </select>
+            </label>
+            <button class="host-btn" id="hostChatClearBtn">🗑️ Clear Current</button>
+          </div>
+          <div class="host-chat-log" id="hostChatLog" style="height:260px;overflow-y:auto;background:#1a1a2e;color:#eee;padding:10px;border-radius:6px;font-size:13px;line-height:1.5;">
+            <div class="host-chat-empty" style="color:#888;">No messages</div>
+          </div>
+          <div class="host-row host-row-end" style="margin-top:8px;">
+            <input class="host-input" id="hostChatInput" type="text" placeholder="Send a message to player..." maxlength="500" style="flex:1;">
+            <button class="host-btn host-btn-primary" id="hostChatSendBtn">📤 Send</button>
+          </div>
+        </div>
+
+        <!-- v2.4.19: 剧本控制(URL/上传) - 移到玩家栏,因为不再有剧本 Tab -->
+        <div class="host-section">
+          <h2 class="host-section-title">📜 Script <small class="host-hint">Preview here after loading · or click the 📜 floating button at bottom-right</small></h2>
+          <div class="host-row">
+            <input class="host-input" id="hostScriptUrl" type="text" placeholder="Script URL (https://...)">
+            <button class="host-btn" id="hostScriptLoadBtn">🌐 Load</button>
+            <button class="host-btn" id="hostScriptClearUrlBtn">✕ Clear</button>
+          </div>
+          <div class="host-row">
+            <input class="host-input" id="hostScriptFileUrl" type="text" placeholder="Uploaded file URL (auto-filled)">
+            <button class="host-btn" id="hostScriptUploadBtn" title="Upload script document (PDF/Word/text)">📁 Upload Script</button>
+            <input type="file" id="hostScriptFile" accept=".pdf,.doc,.docx,.txt,.json,.md,application/pdf,text/plain" style="display:none;">
+            <button class="host-btn" id="hostScriptClearFileBtn">✕ Clear</button>
+          </div>
+          <div class="host-script-viewer" id="hostScriptViewer" style="margin-top:10px;min-height:200px;max-height:500px;background:#1a1a2e;border:1px solid #34495e;border-radius:6px;overflow:auto;">
+            <div class="host-script-empty" style="padding:30px;color:#888;text-align:center;">No script set (URL or uploaded document)</div>
+          </div>
+          <p class="host-hint">💡 Providing a URL previews it inline; after uploading a document (PDF/Word/text) it shows in the floating panel. Only visible to the GM.</p>
+        </div>
+
+        <div class="host-section">
+          <h2 class="host-section-title">🔍 Distribute Clues (Feed) <small class="host-hint">Supports multi-select targets · only name shown on map (can be picked up into inventory)</small></h2>
+          <div class="host-row host-clue-target-row">
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostClueTarget" value="pad" checked> 📢 Feed (current turn player can pick up)
+            </label>
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostClueTarget" value="p1" checked> 🔴 Player 1
+            </label>
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostClueTarget" value="p2"> 🔵 Player 2
+            </label>
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostClueTarget" value="p3"> 🟢 Player 3
+            </label>
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostClueTarget" value="p4"> 🟡 Player 4
+            </label>
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostClueTarget" value="p5"> 🟣 Player 5
+            </label>
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostClueTarget" value="p6"> 🟠 Player 6
+            </label>
+          </div>
+          <div class="host-row">
+            <input class="host-input" id="hostClueTitle" type="text" placeholder="Clue title (e.g. Bloody Key, blank shows ?)" maxlength="100">
+          </div>
+          <div class="host-row">
+            <textarea class="host-input host-textarea" id="hostClueBody" placeholder="Clue body (visible only to GM/selected player; not shown on map)"></textarea>
+          </div>
+          <div class="host-row">
+            <input class="host-input" id="hostClueImage" type="text" placeholder="Image URL (optional)">
+            <button class="host-btn" id="hostClueUploadBtn" data-target="hostClueImage" data-accept="image" title="Upload local image">📁</button>
+            <button class="host-btn" id="hostClueAiBtn" data-ai-generate="item" title="AI generate clue image">🎨 AI</button>
+            <input type="file" id="hostClueFile" data-target="hostClueImage" accept="image/*" style="display:none;">
+            <button class="host-btn host-btn-primary" id="hostSendClueBtn">📤 Send Clue</button>
+          </div>
+        </div>
+
+        <div class="host-section">
+          <h2 class="host-section-title">🎒 Player Inventory <small class="host-hint">Add items directly to a player's inventory</small></h2>
+          <div class="host-row host-clue-target-row">
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostBagTarget" value="p1" checked> 🔴 Player 1
+            </label>
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostBagTarget" value="p2"> 🔵 Player 2
+            </label>
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostBagTarget" value="p3"> 🟢 Player 3
+            </label>
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostBagTarget" value="p4"> 🟡 Player 4
+            </label>
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostBagTarget" value="p5"> 🟣 Player 5
+            </label>
+            <label class="host-checkbox">
+              <input type="checkbox" name="hostBagTarget" value="p6"> 🟠 Player 6
+            </label>
+          </div>
+          <div class="host-row">
+            <input class="host-input" id="hostBagTitle" type="text" placeholder="Item name (e.g. Silver Pocket Watch)" maxlength="60">
+          </div>
+          <div class="host-row">
+            <textarea class="host-input host-textarea" id="hostBagBody" placeholder="Item description/details"></textarea>
+          </div>
+          <div class="host-row">
+            <input class="host-input" id="hostBagImage" type="text" placeholder="Image URL (optional)">
+            <button class="host-btn" id="hostBagUploadBtn" data-accept="image" title="Upload local image">📁</button>
+            <button class="host-btn" id="hostBagAiBtn" data-ai-generate="item" title="AI generate item image">🎨 AI</button>
+            <input type="file" id="hostBagFile" data-target="hostBagImage" accept="image/*" style="display:none;">
+            <button class="host-btn host-btn-primary" id="hostAddBagBtn">🎒 Add to Inventory</button>
+          </div>
+        </div>
+
+        <div class="host-section">
+          <h2 class="host-section-title">📜 Event Log</h2>
+          <div class="host-row">
+            <input class="host-input" id="hostLogInput" type="text" placeholder="Manual record (e.g. P1 rolled 100 - critical roll)" maxlength="200">
+            <button class="host-btn" id="hostLogBtn">📝 Log</button>
+          </div>
+          <div class="host-log" id="hostLog"></div>
+        </div>
+
+        <!-- v2.4.19: 玩家位置已移到版图栏 -->
+
+        <div class="host-section">
+          <h2 class="host-section-title">📬 Content Received by Players</h2>
+          <div class="host-dual-list host-dual-list-6" id="hostReceivedList">
+            <div class="host-mini-col" data-pid="p1">
+              <h3>🔴 Player 1 (<span id="hostP1Count">0</span>)</h3>
+              <div class="host-mini-list" id="hostP1List"><div class="host-mini-empty">None</div></div>
+            </div>
+            <div class="host-mini-col" data-pid="p2">
+              <h3>🔵 Player 2 (<span id="hostP2Count">0</span>)</h3>
+              <div class="host-mini-list" id="hostP2List"><div class="host-mini-empty">None</div></div>
+            </div>
+            <div class="host-mini-col" data-pid="p3">
+              <h3>🟢 Player 3 (<span id="hostP3Count">0</span>)</h3>
+              <div class="host-mini-list" id="hostP3List"><div class="host-mini-empty">None</div></div>
+            </div>
+            <div class="host-mini-col" data-pid="p4">
+              <h3>🟡 Player 4 (<span id="hostP4Count">0</span>)</h3>
+              <div class="host-mini-list" id="hostP4List"><div class="host-mini-empty">None</div></div>
+            </div>
+            <div class="host-mini-col" data-pid="p5">
+              <h3>🟣 Player 5 (<span id="hostP5Count">0</span>)</h3>
+              <div class="host-mini-list" id="hostP5List"><div class="host-mini-empty">None</div></div>
+            </div>
+            <div class="host-mini-col" data-pid="p6">
+              <h3>🟠 Player 6 (<span id="hostP6Count">0</span>)</h3>
+              <div class="host-mini-list" id="hostP6List"><div class="host-mini-empty">None</div></div>
+            </div>
+            <div class="host-empty-rows" id="hostReceivedEmpty" style="display:none; grid-column: 1 / -1;">⏳ Waiting for players to join…</div>
+          </div>
+        </div>
+
+        <div class="host-section host-section-danger">
+          <h2 class="host-section-title">⚠️ Danger Zone</h2>
+          <button class="host-btn host-btn-danger" id="hostClearAllBtn">♻️ Reset Session (clear all content)</button>
+          <button class="host-btn host-btn-danger" id="hostShutdownBtn">🛑 Shutdown Server (all connections will drop)</button>
+          <button class="host-btn host-btn-warn" id="hostRestartBtn">🔄 Restart Server (auto-recovers in ~3 seconds)</button>
+        </div>
+      </div>
+
+      <!-- v2.4.19: 剧本不再有独立 Tab,仅在 FAB 浮窗中显示。剧本 URL/上传移到玩家栏 -->
+    </main>
+
+    <nav class="host-tabs host-tabs-4">
+      <button class="host-tab-btn active" data-tab="map">🗺️<br><span>Map</span></button>
+      <button class="host-tab-btn" data-tab="pad">📢<br><span>Feed</span></button>
+      <button class="host-tab-btn" data-tab="npc">👤<br><span>NPC</span></button>
+      <button class="host-tab-btn" data-tab="player">👥<br><span>Players</span></button>
+    </nav>
+    <!-- v2.4.18: 全局剧本浮窗(任何页面都能打开) -->
+    <button class="host-script-fab" id="hostScriptFab" title="Open script preview">📜</button>
+    <div class="host-script-floating" id="hostScriptFloating" style="display:none;">
+      <div class="host-script-floating-header">
+        <span>📜 Script Preview</span>
+        <button id="hostScriptFloatingClose">✕</button>
+      </div>
+      <div class="host-script-viewer host-script-viewer-floating" id="hostScriptViewerFloating">
+        <div class="host-script-empty">No script set (URL or uploaded document)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====================== 放大弹窗 ====================== -->
+  <div id="zoomModal" class="zoom-modal" style="display:none;">
+    <div class="zoom-backdrop" id="zoomBackdrop"></div>
+    <div class="zoom-content">
+      <button class="zoom-close" id="zoomClose">✕</button>
+      <div class="zoom-title" id="zoomTitle"></div>
+      <div class="zoom-body" id="zoomBody"></div>
+      <div class="zoom-meta" id="zoomMeta"></div>
+    </div>
+  </div>
+
+  <!-- ====================== 骰子弹窗 ====================== -->
+  <div id="diceModal" class="dice-modal" style="display:none;">
+    <div class="dice-backdrop" id="diceBackdrop"></div>
+    <div class="dice-content">
+      <button class="dice-close" id="diceClose">✕</button>
+      <div class="dice-title">🎲 Roll Dice</div>
+      <div class="dice-presets">
+        <button class="dice-btn" data-sides="4">D4</button>
+        <button class="dice-btn" data-sides="6">D6</button>
+        <button class="dice-btn" data-sides="8">D8</button>
+        <button class="dice-btn" data-sides="10">D10</button>
+        <button class="dice-btn" data-sides="12">D12</button>
+        <button class="dice-btn" data-sides="20">D20</button>
+        <button class="dice-btn" data-sides="100">D100</button>
+      </div>
+      <div class="dice-custom">
+        <input class="dice-input" id="diceNotation" type="text" placeholder="Custom: 2D6+1D20+3" maxlength="40">
+        <button class="dice-roll-btn" id="diceRollBtn">🎲 Roll</button>
+      </div>
+      <div class="dice-tip">💡 Click a preset button to roll 1 die of that type, or enter an expression to roll multiple dice</div>
+    </div>
+  </div>
+
+  <!-- v2.4.48: NPC 编辑器和监控弹窗已移除,改为在 NPC tab 页面内联展示 -->
+
+  <!-- ====================== 事件高亮弹窗(v2.4) ====================== -->
+  <div id="eventHighlight" class="event-highlight" style="display:none;">
+    <div class="event-highlight-backdrop"></div>
+    <div class="event-highlight-card">
+      <button class="event-highlight-close" id="eventHighlightClose">✕</button>
+      <div class="event-highlight-title" id="eventHighlightTitle">❓ Event</div>
+      <div class="event-highlight-body" id="eventHighlightBody"></div>
+      <div class="event-highlight-effects" id="eventHighlightEffects" style="display:none;"></div>
+      <div class="event-highlight-meta" id="eventHighlightMeta"></div>
+    </div>
+  </div>
+
+  <!-- 背景音乐播放器(所有视图共享) -->
+  <audio id="bgmAudio" loop preload="auto" style="display:none;"></audio>
+  <div id="bgmIndicator" class="bgm-indicator" style="display:none;">
+    <span class="bgm-icon">🎵</span>
+    <span class="bgm-name" id="bgmName"></span>
+    <button class="bgm-toggle" id="bgmToggle">⏸</button>
+  </div>
+
+  <!-- v2.4.43: AI 图片生成模态框(Agnes AI 接入) - 必须在 client.js 之前,否则 bind 时找不到 DOM -->
+  <!-- v2.4.46: 优化布局,解决内容拥挤问题 -->
+  <div id="aiGenModal" class="modal-overlay" style="display:none;">
+    <div class="modal-card ai-gen-card" style="max-width:620px;">
+      <button class="modal-close" id="aiGenCloseBtn">✕</button>
+      <h3 class="modal-title">🎨 AI Generate Image</h3>
+      <div class="modal-body ai-gen-body">
+        <p class="host-hint ai-gen-hint" id="aiGenHint">Enter a description (Chinese or English); AI will auto-translate it into an English prompt to generate an image</p>
+        <label class="host-label ai-gen-field">📝 Image description
+          <textarea id="aiGenPrompt" class="host-input host-textarea ai-gen-textarea" rows="3" placeholder="e.g. A mysterious gothic castle atop a moonlit cliff wreathed in mist"></textarea>
+        </label>
+        <div class="ai-gen-options-row">
+          <label class="host-label ai-gen-size-field">📐 Size
+            <select id="aiGenSize" class="host-input">
+              <option value="1024x576">1024×576 (16:9 · Map)</option>
+              <option value="1280x720">1280×720 (16:9 · HD)</option>
+              <option value="1024x768">1024×768 (4:3 · Landscape)</option>
+              <option value="768x1024">768×1024 (Portrait)</option>
+              <option value="1024x1024">1024×1024 (Square · Avatar)</option>
+              <option value="512x512">512×512 (Fast · Small)</option>
+            </select>
+          </label>
+          <label class="ai-gen-translate-field">
+            <input type="checkbox" id="aiGenTranslate" checked>
+            <span>Auto-translate Chinese</span>
+          </label>
+        </div>
+        <div id="aiGenStatus" class="ai-gen-status" style="display:none;"></div>
+        <div id="aiGenPreview" class="ai-gen-preview" style="display:none;">
+          <img id="aiGenPreviewImg" alt="AI generated preview" class="ai-gen-preview-img">
+          <p class="host-hint ai-gen-prompt-display" id="aiGenPromptDisplay"></p>
+        </div>
+        <div class="modal-footer ai-gen-footer">
+          <button class="host-btn" id="aiGenCancelBtn">Cancel</button>
+          <button class="host-btn host-btn-primary" id="aiGenSubmitBtn">🚀 Generate</button>
+          <button class="host-btn host-btn-primary" id="aiGenUseBtn" style="display:none;">✅ Use This Image</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 实时模式:加载 socket.io 客户端(由 server.js 服务) -->
+  <script src="/socket.io/socket.io.js"></script>
+  <!-- 客户端(v2.4.51) - ?v 改了浏览器就会重新拉取,避免用老版本卡在"未连接" -->
+  <script src="client.js?v=2.4.51"></script>
+</body>
+</html>
