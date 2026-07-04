@@ -8,14 +8,14 @@
 
 <table>
   <tr>
-    <td width="33%" align="center"><b>Home / Role Select (Desktop)</b></td>
-    <td width="33%" align="center"><b>Player Join (Mobile)</b></td>
-    <td width="33%" align="center"><b>English Version</b></td>
+    <td width="33%" align="center"><b>Host Console (Desktop)</b></td>
+    <td width="33%" align="center"><b>Player View (Mobile)</b></td>
+    <td width="33%" align="center"><b>Big Screen / Pad Board (Tablet/TV)</b></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/01-home-desktop.png" alt="Home / role selection on desktop" width="100%"/></td>
-    <td><img src="docs/screenshots/02-join-mobile.png" alt="Player join page on mobile" width="100%"/></td>
-    <td><img src="docs/screenshots/03-home-en.png" alt="English version home" width="100%"/></td>
+    <td><img src="docs/screenshots/01-host-view.png" alt="Host console view" width="100%"/></td>
+    <td><img src="docs/screenshots/03-player-view.png" alt="Player view on mobile" width="100%"/></td>
+    <td><img src="docs/screenshots/02-pad-view.png" alt="Pad / big screen board view" width="100%"/></td>
   </tr>
 </table>
 
@@ -60,7 +60,7 @@ Then open http://localhost:3000/ in your browser.
 
 1. **Host**: Open the URL on your computer, pick "Game Master" role. Use the console to upload maps, place NPCs, manage turns.
 2. **Players**: Scan the QR code shown on the host screen, or visit the LAN URL on their phones. Pick a player slot.
-3. **Big screen (optional)**: Open the URL on a tablet/TV, pick "Pad Board". Displays the public map with real-time token movements.
+3. **Big screen (required)**: Open the URL on a tablet/TV, pick "Pad Board". Displays the public map with real-time token movements. Each session must have a big-screen device — it's how all players see the shared board.
 
 ## 🔧 Configuration (AI features)
 
