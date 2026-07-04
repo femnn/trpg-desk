@@ -27,6 +27,9 @@
   <!-- v2.4.50: 店家品牌水印(康康桌游)- 固定右下角,不遮挡 UI -->
   <div id="brandWatermark" class="brand-watermark">KangKang Board Games</div>
 
+  <!-- v2.4.51: Language switch button - top right, switch anytime -->
+  <button id="langSwitchBtn" class="lang-switch-btn" title="Switch Language / 切换语言" onclick="toggleLanguage()">🌐 中文</button>
+
   <!-- ====================== 首页 / 角色选择 ====================== -->
   <div id="homeView" class="view home-view">
     <div class="bg-noise"></div>
@@ -1626,5 +1629,29 @@
   <script src="/socket.io/socket.io.js"></script>
   <!-- 客户端(v2.4.51) - ?v 改了浏览器就会重新拉取,避免用老版本卡在"未连接" -->
   <script src="client.js?v=2.4.51"></script>
+  <script>
+    // v2.4.51: Language switch - English version toggles to Chinese version (/), preserving path & params
+    function toggleLanguage() {
+      try {
+        var path = window.location.pathname;
+        var search = window.location.search || '';
+        var hash = window.location.hash || '';
+        var target;
+        // Currently English (/en/...), switch to Chinese (/)
+        if (path.indexOf('/en') === 0) {
+          target = '/' + search + hash;
+        } else if (path === '/' || path === '/index.html' || path === '') {
+          target = '/en/' + search + hash;
+        } else {
+          target = '/en/' + search + hash;
+        }
+        // Save language preference
+        try { localStorage.setItem('trpg-desk-lang', target.indexOf('/en') === 0 ? 'en' : 'zh'); } catch (e) {}
+        window.location.href = target;
+      } catch (e) {
+        console.error('Language switch failed:', e);
+      }
+    }
+  </script>
 </body>
 </html>
