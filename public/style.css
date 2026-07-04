@@ -1378,28 +1378,27 @@ textarea { resize: vertical; min-height: 60px; font-family: var(--serif); }
 
 /* =================================================================
    v2.4.50: 店家品牌水印(康康桌游)
-   - 固定顶部居中,半透明金色描边,显眼但不遮挡 UI
+   - 固定左下角,半透明金色描边,显眼但不遮挡顶部 UI
    - pointer-events:none 不阻挡点击
    - z-index 低于模态框(模态框通常 5000+),高于普通内容
    ================================================================= */
 .brand-watermark {
   position: fixed;
-  top: 6px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: 12px;
+  bottom: 10px;
   z-index: 4000;
   pointer-events: none;
   user-select: none;
   font-family: var(--display, 'Cinzel', serif);
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
-  letter-spacing: 3px;
+  letter-spacing: 2.5px;
   color: rgba(212, 175, 110, 0.78);
   text-shadow:
     0 0 6px rgba(0, 0, 0, 0.85),
     0 1px 3px rgba(0, 0, 0, 0.9),
     0 0 14px rgba(212, 175, 110, 0.35);
-  padding: 4px 14px;
+  padding: 4px 12px;
   border-radius: 4px;
   white-space: nowrap;
   background: linear-gradient(180deg, rgba(26, 20, 16, 0.55) 0%, rgba(26, 20, 16, 0.25) 100%);
@@ -1407,23 +1406,25 @@ textarea { resize: vertical; min-height: 60px; font-family: var(--serif); }
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
 }
-/* Pad 端(大屏)水印更大更靠上 */
+/* Pad 端(大屏)水印稍大 */
 @media (min-width: 900px) {
   .brand-watermark {
-    font-size: 28px;
-    letter-spacing: 4px;
-    top: 10px;
-    padding: 6px 20px;
+    font-size: 22px;
+    letter-spacing: 3px;
+    left: 18px;
+    bottom: 14px;
+    padding: 6px 16px;
     color: rgba(212, 175, 110, 0.85);
   }
 }
-/* 玩家手机端字号略小但仍清晰可见 */
+/* 玩家手机端字号略小 */
 @media (max-width: 600px) {
   .brand-watermark {
-    font-size: 16px;
-    letter-spacing: 2px;
-    top: 4px;
-    padding: 3px 10px;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    left: 8px;
+    bottom: 6px;
+    padding: 3px 8px;
     color: rgba(212, 175, 110, 0.82);
   }
 }
@@ -1432,6 +1433,57 @@ textarea { resize: vertical; min-height: 60px; font-family: var(--serif); }
 :-webkit-full-screen .brand-watermark {
   z-index: 2147483646;
   opacity: 0.85;
+}
+
+/* =================================================================
+   v2.4.51: 语言切换按钮 - 右上角,随时切换中英文
+   ================================================================= */
+.lang-switch-btn {
+  position: fixed;
+  top: 10px;
+  right: 12px;
+  z-index: 4500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  font-family: var(--display, 'Cinzel', serif);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  color: rgba(212, 175, 110, 0.95);
+  background: linear-gradient(180deg, rgba(26, 20, 16, 0.85) 0%, rgba(26, 20, 16, 0.7) 100%);
+  border: 1px solid rgba(212, 175, 110, 0.5);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  user-select: none;
+}
+.lang-switch-btn:hover {
+  background: linear-gradient(180deg, rgba(212, 175, 110, 0.18) 0%, rgba(26, 20, 16, 0.85) 100%);
+  border-color: rgba(212, 175, 110, 0.85);
+  color: rgba(255, 230, 180, 1);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(212, 175, 110, 0.25);
+}
+.lang-switch-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+@media (max-width: 600px) {
+  .lang-switch-btn {
+    top: 6px;
+    right: 8px;
+    padding: 4px 9px;
+    font-size: 11px;
+  }
+}
+:fullscreen .lang-switch-btn,
+:-webkit-full-screen .lang-switch-btn {
+  z-index: 2147483646;
 }
 
 /* ===================================================================
