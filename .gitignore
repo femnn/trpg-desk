@@ -1,0 +1,36 @@
+node_modules/
+*.log
+.DS_Store
+Thumbs.db
+
+# Runtime data (not for source repo)
+uploads/
+logs/
+versions/
+release/
+server-*.log
+server-stdout-*.log
+server-err-*.log
+stderr.log
+stdout.log
+out.log
+
+# Local config (contains API keys)
+config.json
+
+# Trae IDE
+.trae/
+
+# Temp/test
+tests-old/
+opencli-trpgdesk/
+test-*.js
+verify.cmd
+verify.sh
+switch-to.cmd
+switch-to.sh
+start-server.bat
+start-server.sh
+demo-deploy.js
+DEPLOY.md
+
