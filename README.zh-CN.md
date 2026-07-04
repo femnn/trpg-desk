@@ -8,14 +8,14 @@
 
 <table>
   <tr>
-    <td width="33%" align="center"><b>首页 / 角色选择(桌面)</b></td>
-    <td width="33%" align="center"><b>玩家扫码加入(手机)</b></td>
-    <td width="33%" align="center"><b>英文版界面</b></td>
+    <td width="33%" align="center"><b>主持人控制台(电脑端)</b></td>
+    <td width="33%" align="center"><b>玩家视图(手机端)</b></td>
+    <td width="33%" align="center"><b>大屏 / Pad 公共版图(平板/电视)</b></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/01-home-desktop.png" alt="首页角色选择桌面版" width="100%"/></td>
-    <td><img src="docs/screenshots/02-join-mobile.png" alt="玩家扫码加入手机版" width="100%"/></td>
-    <td><img src="docs/screenshots/03-home-en.png" alt="英文版首页" width="100%"/></td>
+    <td><img src="docs/screenshots/01-host-view.png" alt="主持人控制台界面" width="100%"/></td>
+    <td><img src="docs/screenshots/03-player-view.png" alt="玩家手机端界面" width="100%"/></td>
+    <td><img src="docs/screenshots/02-pad-view.png" alt="大屏 Pad 公共版图界面" width="100%"/></td>
   </tr>
 </table>
 
@@ -60,7 +60,7 @@ npm start
 
 1. **主持人**:在电脑打开网址,选择"主持人"角色。用控制台上传版图、放置 NPC、管理回合。
 2. **玩家**:用手机扫描主持人屏幕上的二维码,或访问局域网网址。选择一个玩家位置进入。
-3. **大屏(可选)**:在平板/电视打开网址,选择"Pad 桌面"。展示公共版图,实时同步棋子移动。
+3. **大屏(每局必备)**:在平板/电视打开网址,选择"Pad 桌面"。展示公共版图,实时同步棋子移动。每局必须有大屏设备,所有玩家通过它查看共享版图。
 
 ## 🔧 AI 功能配置
 
