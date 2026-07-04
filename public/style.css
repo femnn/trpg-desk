@@ -1436,12 +1436,12 @@ textarea { resize: vertical; min-height: 60px; font-family: var(--serif); }
 }
 
 /* =================================================================
-   v2.4.51: 语言切换按钮 - 右上角,随时切换中英文
+   v2.4.51: 语言切换按钮 - 右下角,远离顶部所有按钮
    ================================================================= */
 .lang-switch-btn {
   position: fixed;
-  top: 10px;
   right: 12px;
+  bottom: 10px;
   z-index: 4500;
   display: inline-flex;
   align-items: center;
@@ -1473,10 +1473,18 @@ textarea { resize: vertical; min-height: 60px; font-family: var(--serif); }
   transform: translateY(0);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
+@media (min-width: 900px) {
+  .lang-switch-btn {
+    right: 18px;
+    bottom: 14px;
+    padding: 7px 14px;
+    font-size: 14px;
+  }
+}
 @media (max-width: 600px) {
   .lang-switch-btn {
-    top: 6px;
     right: 8px;
+    bottom: 6px;
     padding: 4px 9px;
     font-size: 11px;
   }
@@ -1485,6 +1493,8 @@ textarea { resize: vertical; min-height: 60px; font-family: var(--serif); }
 :-webkit-full-screen .lang-switch-btn {
   z-index: 2147483646;
 }
+/* v2.4.51: 主持人端隐藏康康桌游水印(只在玩家端和 Pad 端显示) */
+body.role-host .brand-watermark { display: none !important; }
 
 /* ===================================================================
    v2.4.36: 角色选择页 (/join) - 手机扫码专用
