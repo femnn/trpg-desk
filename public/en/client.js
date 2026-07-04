@@ -2432,6 +2432,9 @@ function showView(name) {
   if (name !== 'pad') padFeedOpen = false;
   // 视图切换后刷新 BGM 指示器
   if (lastState) syncBgm(lastState.bgm);
+  // v2.4.51: track current role on body for CSS watermark control
+  document.body.className = document.body.className.replace(/role-\w+/g, '').trim();
+  document.body.classList.add('role-' + name);
 }
 
 function renderView() {
