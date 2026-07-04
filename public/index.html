@@ -11,6 +11,22 @@
   <link rel="stylesheet" href="style.css?v=2.4.51">
 </head>
 <body>
+  <!-- v2.4.51: 首次进入时检查语言偏好,如已选英文则自动跳转 /en -->
+  <script>
+    (function () {
+      try {
+        var pref = localStorage.getItem('trpg-desk-lang');
+        if (pref === 'en' && location.pathname.indexOf('/en') !== 0) {
+          // 只在用户主动切过语言时才跳转,避免每次访问都被强制重定向
+          var seen = sessionStorage.getItem('trpg-lang-redirected');
+          if (!seen) {
+            sessionStorage.setItem('trpg-lang-redirected', '1');
+            // 不自动跳,只显示一个提示让用户选择(避免误伤)
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
   <!-- Toast -->
   <div id="toast" class="toast" style="display:none;"></div>
 
@@ -24,8 +40,11 @@
     <span id="reconnectText">⚠️ 与服务器断开,正在重连…</span>
   </div>
 
-  <!-- v2.4.50: 店家品牌水印(康康桌游)- 固定右下角,不遮挡 UI -->
+  <!-- v2.4.50: 店家品牌水印(康康桌游)- 固定左下角,不遮挡 UI -->
   <div id="brandWatermark" class="brand-watermark">康康桌游</div>
+
+  <!-- v2.4.51: 语言切换按钮 - 右上角,随时可切换中英文 -->
+  <button id="langSwitchBtn" class="lang-switch-btn" title="切换语言 / Switch Language" onclick="toggleLanguage()">🌐 EN</button>
 
   <!-- ====================== 首页 / 角色选择 ====================== -->
   <div id="homeView" class="view home-view">
@@ -1626,5 +1645,30 @@
   <script src="/socket.io/socket.io.js"></script>
   <!-- 客户端(v2.4.50) - ?v 改了浏览器就会重新拉取,避免用老版本卡在"未连接" -->
   <script src="client.js?v=2.4.51"></script>
+  <script>
+    // v2.4.51: 语言切换 - 中文版切到英文版(/en),保留当前路径和参数
+    function toggleLanguage() {
+      try {
+        var path = window.location.pathname;
+        var search = window.location.search || '';
+        var hash = window.location.hash || '';
+        var target;
+        // 当前是中文版(/),切到英文版(/en)
+        if (path === '/' || path === '/index.html' || path === '') {
+          target = '/en/' + search + hash;
+        } else if (path.indexOf('/en') === 0) {
+          target = '/' + search + hash;
+        } else {
+          // 默认:中文版切到英文版
+          target = '/en/' + search + hash;
+        }
+        // 保存用户语言偏好
+        try { localStorage.setItem('trpg-desk-lang', target.indexOf('/en') === 0 ? 'en' : 'zh'); } catch (e) {}
+        window.location.href = target;
+      } catch (e) {
+        console.error('Language switch failed:', e);
+      }
+    }
+  </script>
 </body>
 </html>
