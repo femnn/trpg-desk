@@ -8,14 +8,14 @@
 
 <table>
   <tr>
-    <td width="33%" align="center"><b>主持人版图界面</b></td>
-    <td width="33%" align="center"><b>NPC AI 对话</b></td>
-    <td width="33%" align="center"><b>玩家手机端</b></td>
+    <td width="33%" align="center"><b>首页 / 角色选择(桌面)</b></td>
+    <td width="33%" align="center"><b>玩家扫码加入(手机)</b></td>
+    <td width="33%" align="center"><b>英文版界面</b></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/01-game-board.png" alt="主持人版图与棋子" width="100%"/></td>
-    <td><img src="docs/screenshots/02-npc-dialogue.png" alt="NPC AI 对话界面" width="100%"/></td>
-    <td><img src="docs/screenshots/03-mobile-character.png" alt="玩家手机角色卡" width="100%"/></td>
+    <td><img src="docs/screenshots/01-home-desktop.png" alt="首页角色选择桌面版" width="100%"/></td>
+    <td><img src="docs/screenshots/02-join-mobile.png" alt="玩家扫码加入手机版" width="100%"/></td>
+    <td><img src="docs/screenshots/03-home-en.png" alt="英文版首页" width="100%"/></td>
   </tr>
 </table>
 
@@ -23,7 +23,7 @@
 
 - **实时多人版图与棋子系统** — 主持人上传版图背景、拖动放置 NPC/线索/事件标记,玩家棋子在大屏实时同步移动;支持回合制管理、HP 显示、地图标记定位。
 - **AI 驱动的 NPC 对话与图片生成** — 主持人一键生成版图背景、NPC 立绘、物品图标;NPC 支持多轮 AI 对话(含性格、记忆、开场白、目的设定)。支持 Agnes AI 或任意 OpenAI 兼容 API。
-- **NPC 商店 + 线索卡 + 背包系统** — 主持人为 NPC 配置商品(金币🪙+库存📦),玩家手机端实时同步商店并购买;线索卡可推送到指定玩家背包。
+- **NPC 商店 + 线索卡 + 背包系统** — 主持人为 NPC 配置商品(金币+库存),玩家手机端实时同步商店并购买;线索卡可推送到指定玩家背包。
 - **跨平台、零安装** — 纯浏览器访问。主持人电脑 + 玩家手机 + 大屏平板/电视,只需同一 Wi-Fi。
 - **中英双语** — 访问 `/` 为中文,访问 `/en` 为英文。同一房间内玩家可使用不同语言。
 
@@ -48,7 +48,7 @@
 ### 方式 B:从源码运行
 
 ```bash
-git clone https://github.com/<your-username>/trpg-desk.git
+git clone https://github.com/femnn/trpg-desk.git
 cd trpg-desk
 npm install
 npm start
@@ -91,7 +91,7 @@ npm start
 | `http://localhost:3000/` | 简体中文 |
 | `http://localhost:3000/en` | English |
 
-**游戏内切换**:点击右上角 🌐 按钮可随时切换语言,无需重启游戏。
+**游戏内切换**:点击右下角 🌐 按钮可随时切换语言,无需重启游戏。
 
 同一房间内的玩家可以各自选择语言,两个版本共用同一套后端、Socket、数据。
 
@@ -132,9 +132,17 @@ trpg-desk/
 └── docker-compose.yml     # Docker Compose
 ```
 
-## 📜 开源协议
+## ⭐ 帮助与支持
 
-MIT — 自由使用、修改、分发。专为桌游店家、TRPG 社区、教育场景设计。
+- **为我投票**:本项目正在参加 TRAE 比赛,请帮忙投票:[TRAE 论坛 - TRPG Desk](https://forum.trae.cn/t/topic/45365)
+- **点个收藏**:如果 TRPG Desk 对你有用,请点击本页面右上角的 ⭐ Star 按钮,让更多人看到这个项目。
+- **欢迎共创**:欢迎提交 Issue 和 PR,一起把这个跑团工具做得更好。
+
+## 📜 开源协议 & 商业合作
+
+**MIT 协议** — 自由使用、修改、分发。
+
+**商业定制**:本项目专为桌游店家、TRPG 社区、教育场景设计。如需品牌定制、功能扩展、商业授权,欢迎通过 GitHub Issues 或 Discussions 留言联系。
 
 ## 🙏 致谢
 
