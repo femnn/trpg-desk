@@ -8,14 +8,14 @@
 
 <table>
   <tr>
-    <td width="33%" align="center"><b>Game Board (Host)</b></td>
-    <td width="33%" align="center"><b>NPC Dialogue (AI)</b></td>
-    <td width="33%" align="center"><b>Player Mobile View</b></td>
+    <td width="33%" align="center"><b>Home / Role Select (Desktop)</b></td>
+    <td width="33%" align="center"><b>Player Join (Mobile)</b></td>
+    <td width="33%" align="center"><b>English Version</b></td>
   </tr>
   <tr>
-    <td><img src="docs/screenshots/01-game-board.png" alt="Game board with map and tokens" width="100%"/></td>
-    <td><img src="docs/screenshots/02-npc-dialogue.png" alt="NPC dialogue with AI" width="100%"/></td>
-    <td><img src="docs/screenshots/03-mobile-character.png" alt="Mobile player character sheet" width="100%"/></td>
+    <td><img src="docs/screenshots/01-home-desktop.png" alt="Home / role selection on desktop" width="100%"/></td>
+    <td><img src="docs/screenshots/02-join-mobile.png" alt="Player join page on mobile" width="100%"/></td>
+    <td><img src="docs/screenshots/03-home-en.png" alt="English version home" width="100%"/></td>
   </tr>
 </table>
 
@@ -23,7 +23,7 @@
 
 - **Real-time multiplayer board & tokens** — Host uploads a map background, drags NPC/clue/event markers; player tokens sync in real time on the big screen. Supports turn-based rounds, HP display, map pings.
 - **AI-powered NPC dialogue & image generation** — One-click AI generation of map backgrounds, NPC portraits, item icons. NPCs support multi-turn AI dialogue (with personality, memory, opening line, and goal). Pluggable Agnes AI or any OpenAI-compatible API.
-- **NPC shop + clue cards + inventory system** — Host configures shop items for NPCs (gold 🪙 + stock 📦); players buy in real time from their phones. Clue cards can be pushed to specific players' inventories.
+- **NPC shop + clue cards + inventory system** — Host configures shop items for NPCs (gold + stock); players buy in real time from their phones. Clue cards can be pushed to specific players' inventories.
 - **Cross-platform, zero-install** — Pure browser. Host on computer, players on phones, public board on tablet/TV. Just need a shared Wi-Fi.
 - **Bilingual (Chinese / English)** — Visit `/` for Chinese, `/en` for English. Players in the same room can use different languages.
 
@@ -48,7 +48,7 @@ The script will:
 ### Option B: From source
 
 ```bash
-git clone https://github.com/<your-username>/trpg-desk.git
+git clone https://github.com/femnn/trpg-desk.git
 cd trpg-desk
 npm install
 npm start
@@ -88,10 +88,10 @@ Copy `config.example.json` to `config.json` and edit:
 
 | URL | Language |
 | --- | --- |
-| `http://localhost:3000/` | 中文 (Simplified Chinese) |
+| `http://localhost:3000/` | Simplified Chinese (简体中文) |
 | `http://localhost:3000/en` | English |
 
-**In-game switch**: Click the 🌐 button in the top-right corner to switch languages anytime — no need to restart the game.
+**In-game switch**: Click the 🌐 button in the bottom-right corner to switch languages anytime — no need to restart the game.
 
 Players in the same room can each pick their preferred language — both versions share the same backend, sockets, and data.
 
@@ -132,9 +132,17 @@ trpg-desk/
 └── docker-compose.yml     # Docker Compose
 ```
 
-## 📜 License
+## ⭐ Help & Support
 
-MIT — feel free to use, modify, and distribute. Designed for tabletop game stores, TRPG communities, and educators.
+- **Vote for us on TRAE**: This project is participating in the TRAE contest. Please help vote: [TRAE Forum - TRPG Desk](https://forum.trae.cn/t/topic/45365)
+- **Star this repo**: If you find TRPG Desk useful, please click the ⭐ Star button at the top right of this page — it helps others discover the project.
+- **Co-creation welcome**: Interested in contributing? Issues and PRs are welcome. Let's build the best TRPG tool together.
+
+## 📜 License & Commercial
+
+**MIT License** — feel free to use, modify, and distribute.
+
+**Commercial customization**: Designed for tabletop game stores, TRPG communities, and educators. If you need custom branding, additional features, or commercial licensing, feel free to reach out via GitHub Issues or Discussions.
 
 ## 🙏 Acknowledgements
 
