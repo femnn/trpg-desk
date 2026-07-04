@@ -1493,8 +1493,10 @@ textarea { resize: vertical; min-height: 60px; font-family: var(--serif); }
 :-webkit-full-screen .lang-switch-btn {
   z-index: 2147483646;
 }
-/* v2.4.51: 主持人端隐藏康康桌游水印(只在玩家端和 Pad 端显示) */
-body.role-host .brand-watermark { display: none !important; }
+/* v2.4.51: 主持人端隐藏康康桌游水印 + 语言切换按钮
+   (主持人端右下角有剧本浮窗等按钮,避免重叠;主持人通常固定一种语言) */
+body.role-host .brand-watermark,
+body.role-host .lang-switch-btn { display: none !important; }
 
 /* ===================================================================
    v2.4.36: 角色选择页 (/join) - 手机扫码专用
