@@ -4,6 +4,21 @@
 
 [English](./README.md) · [简体中文](./README.zh-CN.md)
 
+## 📸 游戏截图
+
+<table>
+  <tr>
+    <td width="33%" align="center"><b>主持人版图界面</b></td>
+    <td width="33%" align="center"><b>NPC AI 对话</b></td>
+    <td width="33%" align="center"><b>玩家手机端</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/01-game-board.png" alt="主持人版图与棋子" width="100%"/></td>
+    <td><img src="docs/screenshots/02-npc-dialogue.png" alt="NPC AI 对话界面" width="100%"/></td>
+    <td><img src="docs/screenshots/03-mobile-character.png" alt="玩家手机角色卡" width="100%"/></td>
+  </tr>
+</table>
+
 ## ✨ 功能特性
 
 - **实时多人版图与棋子系统** — 主持人上传版图背景、拖动放置 NPC/线索/事件标记,玩家棋子在大屏实时同步移动;支持回合制管理、HP 显示、地图标记定位。
@@ -75,6 +90,8 @@ npm start
 | --- | --- |
 | `http://localhost:3000/` | 简体中文 |
 | `http://localhost:3000/en` | English |
+
+**游戏内切换**:点击右上角 🌐 按钮可随时切换语言,无需重启游戏。
 
 同一房间内的玩家可以各自选择语言,两个版本共用同一套后端、Socket、数据。
 
