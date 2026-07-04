@@ -2432,6 +2432,9 @@ function showView(name) {
   if (name !== 'pad') padFeedOpen = false;
   // 视图切换后刷新 BGM 指示器
   if (lastState) syncBgm(lastState.bgm);
+  // v2.4.51: 在 body 上记录当前角色,用于 CSS 控制水印显隐
+  document.body.className = document.body.className.replace(/role-\w+/g, '').trim();
+  document.body.classList.add('role-' + name);
 }
 
 function renderView() {
