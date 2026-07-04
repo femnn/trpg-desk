@@ -1669,6 +1669,22 @@
         console.error('Language switch failed:', e);
       }
     }
+    // v2.4.51: 截图辅助 - URL 带 ?auto=host/pad/p1 自动进入对应角色(仅用于截图)
+    (function () {
+      try {
+        var m = /auto=(host|pad|p1|p2|p3|p4|p5|p6)/.exec(window.location.search);
+        if (!m) return;
+        var role = m[1];
+        // 等待 socket 连接后自动点击角色按钮
+        function tryJoin(attempt) {
+          if (attempt > 40) return; // 最多等 4 秒
+          var btn = document.querySelector('[data-role="' + role + '"], [data-join-role="' + role + '"]');
+          if (btn) { btn.click(); return; }
+          setTimeout(function () { tryJoin(attempt + 1); }, 100);
+        }
+        tryJoin(0);
+      } catch (e) {}
+    })();
   </script>
 </body>
 </html>
