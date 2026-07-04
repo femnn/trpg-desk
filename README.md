@@ -4,6 +4,21 @@
 
 [English](./README.md) · [简体中文](./README.zh-CN.md)
 
+## 📸 Screenshots
+
+<table>
+  <tr>
+    <td width="33%" align="center"><b>Game Board (Host)</b></td>
+    <td width="33%" align="center"><b>NPC Dialogue (AI)</b></td>
+    <td width="33%" align="center"><b>Player Mobile View</b></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/01-game-board.png" alt="Game board with map and tokens" width="100%"/></td>
+    <td><img src="docs/screenshots/02-npc-dialogue.png" alt="NPC dialogue with AI" width="100%"/></td>
+    <td><img src="docs/screenshots/03-mobile-character.png" alt="Mobile player character sheet" width="100%"/></td>
+  </tr>
+</table>
+
 ## ✨ Features
 
 - **Real-time multiplayer board & tokens** — Host uploads a map background, drags NPC/clue/event markers; player tokens sync in real time on the big screen. Supports turn-based rounds, HP display, map pings.
@@ -75,6 +90,8 @@ Copy `config.example.json` to `config.json` and edit:
 | --- | --- |
 | `http://localhost:3000/` | 中文 (Simplified Chinese) |
 | `http://localhost:3000/en` | English |
+
+**In-game switch**: Click the 🌐 button in the top-right corner to switch languages anytime — no need to restart the game.
 
 Players in the same room can each pick their preferred language — both versions share the same backend, sockets, and data.
 
